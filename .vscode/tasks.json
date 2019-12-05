@@ -18,7 +18,7 @@
         {
             "id": "day",
             "type": "promptString",
-            "default": "",
+            "default": "day",
             "description": "Enter day"
         }
     ]

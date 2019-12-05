@@ -1,14 +1,14 @@
 import common as com
 
+test = True
+part1 = True
+part2 = False
+
 def Part1(lines):
     pass
 
 def Part2(lines):
     pass
-
-test = True
-part1 = True
-part2 = False
 
 file = "input.txt"
 
