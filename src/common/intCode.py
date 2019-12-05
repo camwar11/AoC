@@ -6,6 +6,10 @@ class intCode(object):
             2: self.multiply,
             3: self.input,
             4: self.output,
+            5: self.jumpIfTrue,
+            6: self.jumpIfFalse,
+            7: self.lessThan,
+            8: self.equals,
             99: self.halt
         }
         self.HALTED = -1
@@ -32,6 +36,38 @@ class intCode(object):
         print(self.resolveParameter(start_index))
         return 2
     
+    def jumpIfTrue(self, start_index):
+        first = self.resolveParameter(start_index)
+        if first != 0:
+            self.instructionPointer = self.resolveParameter(start_index+1)
+            return 0
+        return 3
+    
+    def jumpIfFalse(self, start_index):
+        first = self.resolveParameter(start_index)
+        if first == 0:
+            self.instructionPointer = self.resolveParameter(start_index+1)
+            return 0
+        return 3
+
+    def lessThan(self, start_index):
+        first = self.resolveParameter(start_index)
+        second = self.resolveParameter(start_index + 1)
+        value = 0
+        if first < second:
+            value = 1
+        self.registers[self.registers[start_index + 2]] = value
+        return 4
+
+    def equals(self, start_index):
+        first = self.resolveParameter(start_index)
+        second = self.resolveParameter(start_index + 1)
+        value = 0
+        if first == second:
+            value = 1
+        self.registers[self.registers[start_index + 2]] = value
+        return 4
+
     def resolveParameter(self, paramIndex):
         offset = paramIndex - self.instructionPointer - 1
         mode = self.paramModes[offset]

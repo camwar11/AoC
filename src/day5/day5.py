@@ -1,8 +1,8 @@
 import common as com
 
 test = False
-part1 = True
-part2 = False
+part1 = False
+part2 = True
 
 def Part1(lines):
     noun = None
@@ -12,15 +12,10 @@ def Part1(lines):
         
 
 def Part2(lines):
-    neededResult = 19690720
+    noun = None
+    verb = None
     computer = com.intCode(lines[0])
-    for noun in range(0, 100):
-        for verb in range(0, 100):
-            result = computer.RunIntCodeComputer(noun, verb, False)
-            if result == neededResult:
-                print(str(100 * noun + verb))
-                return
-    print("No answer")
+    computer.RunIntCodeComputer(noun, verb, False)
 
 file = "input.txt"
 
