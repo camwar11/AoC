@@ -12,6 +12,17 @@
                 "${input:day}"
             ],
             "problemMatcher": []
+        },
+        {
+            "label": "measureDay",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-executionpolicy",
+                "bypass",
+                "./measureDay.ps1 ${input:day}",
+            ],
+            "problemMatcher": []
         }
     ],
     "inputs": [
