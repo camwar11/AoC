@@ -1,5 +1,5 @@
 class intCode(object):
-    def __init__(self, initialMemory):
+    def __init__(self, initialMemory, printOutput = True, presetInputs = None):
         self.initialMemory = [int(i) for i in initialMemory.split(',')]
         self.instructions = {
             1: self.sumIntCode,
@@ -17,6 +17,8 @@ class intCode(object):
         self.POSITION = 0
         self.paramModes = [0, 0, 0, 0]
         self.instructionPointer = 0
+        self.presetInputs = presetInputs
+        self.printOutput = printOutput
 
     def sumIntCode(self, start_index):
         value = self.resolveParameter(start_index) + self.resolveParameter(start_index+1)
@@ -28,12 +30,23 @@ class intCode(object):
         self.registers[self.registers[start_index+2]] = value
         return 4
 
+    def setPresetInputs(self, values):
+        self.presetInputs = values
+
     def input(self, start_index):
-        self.registers[self.registers[start_index]] = int(input('Enter input: '))
+        if self.presetInputs is None:
+            inputValue = int(input('Enter input: '))
+        else:
+            inputValue = self.presetInputs[self.inputIndex]
+            self.inputIndex = self.inputIndex + 1
+
+        self.registers[self.registers[start_index]] = inputValue
         return 2
 
     def output(self, start_index):
-        print(self.resolveParameter(start_index))
+        self.outputValue = self.resolveParameter(start_index)
+        if self.printOutput:
+            print(self.outputValue)
         return 2
     
     def jumpIfTrue(self, start_index):
@@ -81,8 +94,9 @@ class intCode(object):
     def halt(self, start_index):
         return self.HALTED
 
-    def RunIntCodeComputer(self, noun, verb, debug):
+    def RunIntCodeComputer(self, noun = None, verb = None, debug = False):
         self.registers = self.initialMemory.copy()
+        self.inputIndex = 0
         if noun:
             self.registers[1] = noun
         if verb:
