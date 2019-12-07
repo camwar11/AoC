@@ -1,5 +1,5 @@
 class intCode(object):
-    def __init__(self, initialMemory, printOutput = True, presetInputs = None):
+    def __init__(self, initialMemory, printOutput = True, presetInputs = None, needsInputCallback = None, hasOutputCallback = None):
         self.initialMemory = [int(i) for i in initialMemory.split(',')]
         self.instructions = {
             1: self.sumIntCode,
@@ -13,12 +13,16 @@ class intCode(object):
             99: self.halt
         }
         self.HALTED = -1
+        self.PAUSED = -2
         self.IMMEDIATE = 1
         self.POSITION = 0
         self.paramModes = [0, 0, 0, 0]
         self.instructionPointer = 0
         self.presetInputs = presetInputs
         self.printOutput = printOutput
+        self.needsInputCallback = needsInputCallback
+        self.hasOutputCallback = hasOutputCallback
+        self.paused = False
 
     def sumIntCode(self, start_index):
         value = self.resolveParameter(start_index) + self.resolveParameter(start_index+1)
@@ -34,17 +38,22 @@ class intCode(object):
         self.presetInputs = values
 
     def input(self, start_index):
-        if self.presetInputs is None:
-            inputValue = int(input('Enter input: '))
+        if self.needsInputCallback:
+            inputValue = self.needsInputCallback()
         else:
-            inputValue = self.presetInputs[self.inputIndex]
-            self.inputIndex = self.inputIndex + 1
+            if self.presetInputs is None:
+                inputValue = int(input('Enter input: '))
+            else:
+                inputValue = self.presetInputs[self.inputIndex]
+                self.inputIndex = self.inputIndex + 1
 
         self.registers[self.registers[start_index]] = inputValue
         return 2
 
     def output(self, start_index):
         self.outputValue = self.resolveParameter(start_index)
+        if self.hasOutputCallback:
+            self.hasOutputCallback(self.outputValue)
         if self.printOutput:
             print(self.outputValue)
         return 2
@@ -94,8 +103,13 @@ class intCode(object):
     def halt(self, start_index):
         return self.HALTED
 
-    def RunIntCodeComputer(self, noun = None, verb = None, debug = False):
-        self.registers = self.initialMemory.copy()
+    def RunIntCodeComputer(self, noun = None, verb = None, debug = False, reset = True):
+        self.Initialize(noun, verb, debug, reset)
+        return self.Run(debug)
+
+    def Initialize(self, noun = None, verb = None, debug = False, reset = True):
+        if reset or not self.registers:
+            self.registers = self.initialMemory.copy()
         self.inputIndex = 0
         if noun:
             self.registers[1] = noun
@@ -103,7 +117,16 @@ class intCode(object):
             self.registers[2] = verb
 
         self.instructionPointer = 0
-        while True:
+
+    def pause(self):
+        self.paused = True
+    def unpause(self):
+        self.paused = False
+        self.Run()
+    
+    def Run(self, debug = False):
+        self.paused = False
+        while not self.paused:
             rawInstruction = str(self.registers[self.instructionPointer])
             instruction = self.instructions.get(int(rawInstruction[-2:]))
             self.paramModes = [0, 0, 0, 0]
@@ -120,3 +143,4 @@ class intCode(object):
                     print(self.registers)
                 return self.registers[0]
             self.instructionPointer = self.instructionPointer + result
+        return self.PAUSED
