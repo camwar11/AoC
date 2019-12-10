@@ -1,6 +1,7 @@
 class intCode(object):
     def __init__(self, initialMemory, printOutput = True, presetInputs = None, needsInputCallback = None, hasOutputCallback = None):
         self.initialMemory = [int(i) for i in initialMemory.split(',')]
+        self.initialMemory.extend([0 for i in range(40)])
         self.instructions = {
             1: self.sumIntCode,
             2: self.multiply,
@@ -10,12 +11,16 @@ class intCode(object):
             6: self.jumpIfFalse,
             7: self.lessThan,
             8: self.equals,
+            9: self.adjustRelativeBase,
             99: self.halt
         }
-        self.HALTED = -1
         self.PAUSED = -2
-        self.IMMEDIATE = 1
+        self.HALTED = -1
+        
         self.POSITION = 0
+        self.IMMEDIATE = 1
+        self.RELATIVE = 2
+        
         self.paramModes = [0, 0, 0, 0]
         self.instructionPointer = 0
         self.presetInputs = presetInputs
@@ -23,21 +28,22 @@ class intCode(object):
         self.needsInputCallback = needsInputCallback
         self.hasOutputCallback = hasOutputCallback
         self.paused = False
+        self.relativeBase = 0
 
-    def sumIntCode(self, start_index):
-        value = self.resolveParameter(start_index) + self.resolveParameter(start_index+1)
-        self.registers[self.registers[start_index+2]] = value
+    def sumIntCode(self):
+        value = self.resolveParameterValue(0) + self.resolveParameterValue(1)
+        self.setMemoryValue(2, value)
         return 4
 
-    def multiply(self, start_index):
-        value = self.resolveParameter(start_index) * self.resolveParameter(start_index+1)
-        self.registers[self.registers[start_index+2]] = value
+    def multiply(self):
+        value = self.resolveParameterValue(0) * self.resolveParameterValue(1)
+        self.setMemoryValue(2, value)
         return 4
 
     def setPresetInputs(self, values):
         self.presetInputs = values
 
-    def input(self, start_index):
+    def input(self):
         if self.needsInputCallback:
             inputValue = self.needsInputCallback()
         else:
@@ -47,60 +53,87 @@ class intCode(object):
                 inputValue = self.presetInputs[self.inputIndex]
                 self.inputIndex = self.inputIndex + 1
 
-        self.registers[self.registers[start_index]] = inputValue
+        self.setMemoryValue(0, inputValue)
         return 2
 
-    def output(self, start_index):
-        self.outputValue = self.resolveParameter(start_index)
+    def output(self):
+        self.outputValue = self.resolveParameterValue(0)
         if self.hasOutputCallback:
             self.hasOutputCallback(self.outputValue)
         if self.printOutput:
             print(self.outputValue)
         return 2
     
-    def jumpIfTrue(self, start_index):
-        first = self.resolveParameter(start_index)
+    def jumpIfTrue(self):
+        first = self.resolveParameterValue(0)
         if first != 0:
-            self.instructionPointer = self.resolveParameter(start_index+1)
+            self.instructionPointer = self.resolveParameterValue(1)
             return 0
         return 3
     
-    def jumpIfFalse(self, start_index):
-        first = self.resolveParameter(start_index)
+    def jumpIfFalse(self):
+        first = self.resolveParameterValue(0)
         if first == 0:
-            self.instructionPointer = self.resolveParameter(start_index+1)
+            self.instructionPointer = self.resolveParameterValue(1)
             return 0
         return 3
 
-    def lessThan(self, start_index):
-        first = self.resolveParameter(start_index)
-        second = self.resolveParameter(start_index + 1)
+    def lessThan(self):
+        first = self.resolveParameterValue(0)
+        second = self.resolveParameterValue(1)
         value = 0
         if first < second:
             value = 1
-        self.registers[self.registers[start_index + 2]] = value
+        self.setMemoryValue(2, value)
         return 4
 
-    def equals(self, start_index):
-        first = self.resolveParameter(start_index)
-        second = self.resolveParameter(start_index + 1)
+    def equals(self):
+        first = self.resolveParameterValue(0)
+        second = self.resolveParameterValue(1)
         value = 0
         if first == second:
             value = 1
-        self.registers[self.registers[start_index + 2]] = value
+        self.setMemoryValue(2, value)
         return 4
+    
+    def adjustRelativeBase(self):
+        self.relativeBase += self.resolveParameterValue(0)
+        return 2
 
-    def resolveParameter(self, paramIndex):
-        offset = paramIndex - self.instructionPointer - 1
-        mode = self.paramModes[offset]
-        if mode == self.IMMEDIATE:
-            return self.registers[paramIndex]
-        if mode == self.POSITION:
-            return self.registers[self.registers[paramIndex]]
+    def setMemoryValue(self, index, value):
+        abs_index = self.resolveParameterAbsoluteIndex(index)
+        self.checkAndExtendMemory(abs_index)
+        self.registers[abs_index] = value
+
+    def checkAndExtendMemory(self, abs_index):
+        numRegisters = len(self.registers)
+        while abs_index >= numRegisters:
+            self.registers.extend([0 for i in range(numRegisters)])
+            numRegisters *= 2
+
+    def resolveParameterValue(self, paramIndex):
+        index = self.resolveParameterAbsoluteIndex(paramIndex)
+        self.checkAndExtendMemory(index)
+        return self.registers[index]
         
-        raise Exception("Invalid mode " + str(mode))
 
-    def halt(self, start_index):
+    def resolveParameterAbsoluteIndex(self, paramIndex):
+        mode = self.paramModes[paramIndex]
+        paramAbsoluteIndex = self.instructionPointer + paramIndex + 1
+        self.checkAndExtendMemory(paramAbsoluteIndex)
+        if mode == self.IMMEDIATE:
+            return paramAbsoluteIndex
+        elif mode == self.POSITION:
+            index = paramAbsoluteIndex
+        elif mode == self.RELATIVE:
+            return self.relativeBase + self.registers[paramAbsoluteIndex]
+        else:
+            raise Exception("Invalid mode " + str(mode))
+        
+        self.checkAndExtendMemory(index)
+        return self.registers[index]
+
+    def halt(self):
         return self.HALTED
 
     def RunIntCodeComputer(self, noun = None, verb = None, debug = False, reset = True):
@@ -117,6 +150,7 @@ class intCode(object):
             self.registers[2] = verb
 
         self.instructionPointer = 0
+        self.relativeBase = 0
 
     def pause(self):
         self.paused = True
@@ -137,7 +171,7 @@ class intCode(object):
 
             if instruction is None:
                 raise Exception("invalid instruction " + str(self.registers[self.instructionPointer]))
-            result = instruction(self.instructionPointer+1)
+            result = instruction()
             if result is self.HALTED:
                 if debug:
                     print(self.registers)
