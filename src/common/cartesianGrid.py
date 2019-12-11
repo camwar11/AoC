@@ -11,12 +11,12 @@ class Point(object):
     
     def setGrid(self, grid):
         self.grid = grid
-
-    def ManhattenDistance(self, x, y):
-        return CartesianGrid.ManhattenDistance(self.x, x, self.y, y)
     
     def ManhattenDistance(self, otherPoint):
         return CartesianGrid.ManhattenDistance(self.x, otherPoint.x, self.y, otherPoint.y)
+    
+    def SlopeBetweenPoints(self, otherPoint):
+        return CartesianGrid.Slope(self.x, otherPoint.x, self.y, otherPoint.y)
 
 class CartesianGrid(object):
     def __init__(self):
@@ -67,11 +67,18 @@ class CartesianGrid(object):
                         string = string + str(value)
             string = string + '\n'
         return string
-
-    @staticmethod
-    def ManhattenDistance(point1, point2):
-        return point1.ManhattenDistance(point2)
     
     @staticmethod
     def ManhattenDistance(x1, x2, y1, y2):
         return abs(x1 - x2) + abs(y1 - y2)
+
+    @staticmethod
+    def Slope(x1, x2, y1, y2):
+        numerator = (y2 - y1)
+        denominator = (x2 - x1)
+        if denominator == 0:
+            # fudge it a little and make it near infinite even if it's really undefined
+            if numerator < 0:
+                return float('-inf')
+            return float('inf')
+        return numerator / denominator
