@@ -2,8 +2,9 @@ import common as com
 from itertools import combinations
 from functools import reduce
 import operator
+import math
 
-test = True
+test = False
 part1 = False
 part2 = True
 
@@ -57,8 +58,30 @@ def Part1(lines):
     
     totalEnergy(moons)    
 
+def toTuple(moon, axis):
+    axisValues = [pos_vel[axis] for pos_vel in moon]
+    return tuple(axisValues)
+
 def Part2(lines):
-    pass
+    moons = readMoons(lines)
+    
+    previousStates = [{} for axis in range(3)]
+    foundRepeat = [False for axis in range(3)]
+
+    i = 1
+    while True:
+        applyGravity(moons)
+        applyVelocity(moons)
+        moonIdx = 0
+
+        for axis in range(3):
+            if 0 == reduce(operator.add, [abs(vel[axis]) for vel in [moon[1] for moon in moons]]):
+                foundRepeat[axis] = i
+        i += 1
+        if reduce(lambda x, y : bool(x) and bool(y), foundRepeat):
+            break
+    lcm = com.lcm(foundRepeat) 
+    print('Took ', lcm, ' iterations or maybe ', lcm * 2) # not sure why I have to multiply by 2 sometimes but it works on the tests
     
 
 file = "input.txt"
