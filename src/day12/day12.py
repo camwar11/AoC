@@ -11,7 +11,7 @@ part2 = True
 def readMoons(lines):
     moons = []
     for line in lines:
-        values = [int(i.split('=')[1].strip('>\n')) for i in line.split(',')]
+        values = com.parseXYZCoords(line)
         moons.append([values, [0, 0 ,0]])
     return moons
 
