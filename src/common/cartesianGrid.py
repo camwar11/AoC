@@ -18,9 +18,14 @@ class Point(object):
     def AngleBetweenPoints(self, otherPoint):
         return CartesianGrid.Angle(self.x, otherPoint.x, self.y, otherPoint.y)
 
+def defaultCellOutputStr(cell):
+        return str(cell)
+
 class CartesianGrid(object):
-    def __init__(self):
+    def __init__(self, emptyCellOutput = '.', cellOutputStrFcn = defaultCellOutputStr):
         self.grid = {}
+        self.emptyCellOutput = emptyCellOutput
+        self.cellOutputStrFcn = cellOutputStrFcn
     
     def addPoint(self, point):
         xAxis = self.grid.get(point.x)
@@ -54,17 +59,17 @@ class CartesianGrid(object):
                 if maxY is None or y > maxY:
                     maxY = y
         
-        for y in range(maxY, minY, -1):
-            for x in range(minX, maxX):
+        for y in range(maxY, minY - 1, -1):
+            for x in range(minX, maxX + 1):
                 yAxis = self.grid.get(x)
                 if yAxis is None:
-                    string = string + '.'
+                    string = string + self.emptyCellOutput
                 else:
                     value = yAxis.get(y)
                     if value is None:
-                        string = string + '.'
+                        string = string + self.emptyCellOutput
                     else:
-                        string = string + str(value)
+                        string = string + self.cellOutputStrFcn(value)
             string = string + '\n'
         return string
     

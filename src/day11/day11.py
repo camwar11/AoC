@@ -1,14 +1,20 @@
 import common as com
 
 test = False
-part1 = True
-part2 = False
+part1 = False
+part2 = True
 
-def Part1(lines):
-    grid = com.CartesianGrid()
+def cellStr(cell):
+    if cell.data == 0:
+        return ' '
+    else:
+        return 'X'
+
+def runRobot(line, startingColor):
+    grid = com.CartesianGrid(' ', cellStr)
     black = 0
     white = 1
-    currentPoint = com.Point(0, 0, black)
+    currentPoint = com.Point(0, 0, startingColor)
     grid.addPoint(currentPoint)
     painted = set()
     needsColorOutput = True
@@ -47,11 +53,16 @@ def Part1(lines):
     
     intcode = com.intCode(lines[0], printOutput=False, needsInputCallback=inputCallback, hasOutputCallback=outputCallback)
     intcode.RunIntCodeComputer()
-    print('Painted ', len(painted))
+    return painted, grid
+
+def Part1(lines):
+    painted, grid = runRobot(lines[0], 0)
+    print('Painted', len(painted))
 
 
 def Part2(lines):
-    pass
+    painted, grid = runRobot(lines[0], 1)
+    print(grid)
 
 file = "input.txt"
 
