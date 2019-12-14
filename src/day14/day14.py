@@ -63,12 +63,29 @@ def Part2(lines):
             amount = int(amount)
             inputs.append((amount, element))
         reactions[outputElement] = (outputAmount, inputs)
-    elementUsage = {}
-    leftoverElements = {}
-    leftoverElements['ORE'] = 999999999999999999999999999999
 
-    runReaction('FUEL', 999999999999999999999999999, reactions, elementUsage, leftoverElements)   
-    print(leftoverElements['FUEL']) 
+    fuelLow = 0
+    fuelHigh = 10000000
+    target = 1000000000000
+    def runSearch(value):
+        elementUsage = {}
+        leftoverElements = {}
+        leftoverElements['ORE'] = 999999999999999999999999999999
+        runReaction('FUEL', value, reactions, elementUsage, leftoverElements)   
+        usage = int(elementUsage['ORE'])
+        return usage
+    
+    def targetValueIsHigher(value):
+        nonlocal target
+        return value < target
+    
+    def targetValueIsLower(value):
+        nonlocal target
+        return value > target
+
+    result = com.binary_search(fuelLow, fuelHigh, runSearch, targetValueIsHigher, targetValueIsLower )
+
+    print(result)
 
 file = "input.txt"
 
