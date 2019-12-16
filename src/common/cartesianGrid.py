@@ -49,6 +49,32 @@ class CartesianGrid(object):
         if xAxis is not None:
             return xAxis.get(y)
         return None
+    
+    def getAllPoints(self):
+        minX = None
+        maxX = None
+        minY = None
+        maxY = None
+        allPoints = []
+        for x in self.grid.keys():
+            if minX is None or x < minX:
+                minX = x
+            if maxX is None or x > maxX:
+                maxX = x
+            for y in self.grid[x].keys():
+                if minY is None or y < minY:
+                    minY = y
+                if maxY is None or y > maxY:
+                    maxY = y
+        
+        for y in range(maxY, minY - 1, -1):
+            for x in range(minX, maxX + 1):
+                yAxis = self.grid.get(x)
+                if yAxis is not None:
+                    value = yAxis.get(y)
+                    if value is not None:
+                        allPoints.append(value)
+        return allPoints
 
     def __str__(self):
         minX = None
