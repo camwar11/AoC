@@ -1,4 +1,6 @@
 import math
+from operator import add
+import common.utilityfunctions as util
 
 class Point(object):
     def __init__(self, x, y, data):
@@ -8,6 +10,12 @@ class Point(object):
     
     def __str__(self):
         return str(self.data)
+    
+    def __add__(self, other):
+        if other is Point:
+            other = [other.x, other.y]
+        return util.vector_math(add, [self.x, self.y], other)
+        
     
     def setGrid(self, grid):
         self.grid = grid

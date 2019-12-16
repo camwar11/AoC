@@ -12,3 +12,17 @@ def binary_search(low, high, closureToRun, targetValueIsHigher, targetValueIsLow
         elif targetValueIsLower(result):
             high = currentTest - 1
     return low
+
+def vector_math(operator, first, second):
+    result = []
+    firstLen = len(first)
+    secondLen = len(second)
+    maxLen = max(firstLen, secondLen)
+    for index in range(maxLen):
+        if index >= firstLen:
+            result.append(second[index])
+        elif index >= secondLen:
+            result.append(first[index])
+        else:
+            result.append(operator(first[index], second[index])) 
+    return result
