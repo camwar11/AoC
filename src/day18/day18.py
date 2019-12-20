@@ -1,7 +1,7 @@
 import common as com
 from copy import deepcopy
 
-test = True
+test = False
 part1 = True
 part2 = False
 

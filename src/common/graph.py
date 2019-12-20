@@ -11,32 +11,31 @@ class Graph(object):
     def add_node(self, node):
         existing = self.__graph.get(node)
         if existing is None:
-            self.__graph[node] = []
+            self.__graph[node] = {}
 
     def remove_node(self, node, reattachEnds = True):
         connected = self.__graph.get(node)
         for otherNode in connected:
-            otherNodesConnections = self.__graph.get(otherNode[self.NODE])
-            index = 0
-            for otherNodeConnection in otherNodesConnections:
-                if otherNodeConnection[self.NODE] == node:
-                    break
-                index += 1
-            removedConnection = otherNodesConnections.pop(index)
+            otherNodesConnections = self.__graph.get(otherNode)
+            if node in otherNodesConnections:
+                otherNodesConnections.pop(node)
             if reattachEnds:
                 for reattachNode in connected:
                     if reattachNode == otherNode:
                         continue
-                    self.add_edge(otherNode[self.NODE], reattachNode[self.NODE], otherNode[self.EDGE] + reattachNode[self.EDGE], False )
+                    self.add_edge(otherNode, reattachNode, connected[otherNode] + connected[reattachNode], False )
         self.__graph.pop(node)
 
     def __add_edge_impl(self, source, destination, edgeInfo, addReverse):
         existing = self.__graph.get(source)
         if existing is None:
-            existing = []
+            existing = {}
             self.__graph[source] = existing
-        edge = (edgeInfo, destination)
-        existing.append(edge)
+        existingEdge = existing.get(destination)
+        if existingEdge is not None:
+            test = 0
+        if existingEdge is None or (self.edgeWeightFcn is not None and self.edgeWeightFcn(source, destination, existingEdge) > self.edgeWeightFcn(source, destination, edgeInfo)) or (self.edgeWeightFcn is None and existingEdge > edgeInfo):
+            existing[destination] = edgeInfo
         if addReverse:
             self.__add_edge_impl(destination, source, edgeInfo, False)
     
@@ -49,4 +48,4 @@ class Graph(object):
         edges = self.__graph.get(source)
         if self.edgeWeightFcn is None:
             return edges
-        return map(lambda edge: (self.edgeWeightFcn(source, edge[self.NODE], edge[self.EDGE]), edge[self.NODE]), edges)
+        return map(lambda edge: (self.edgeWeightFcn(source, edge, edges[edge]), edge), edges)
