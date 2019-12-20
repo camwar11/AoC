@@ -30,6 +30,10 @@ def defaultCellOutputStr(cell):
         return str(cell)
 
 class CartesianGrid(object):
+    UP = [0, 1]
+    RIGHT = [1, 0]
+    DOWN = [0, -1]
+    LEFT = [-1, 0]
     def __init__(self, emptyCellOutput = '.', cellOutputStrFcn = defaultCellOutputStr):
         self.grid = {}
         self.emptyCellOutput = emptyCellOutput
