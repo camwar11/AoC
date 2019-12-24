@@ -10,6 +10,8 @@ impossible = 999999999999999
 def edgeWeightFcn(ownedKeys):
     def edgeWeight(source, dest, edge):
         global impossible
+        if isinstance(source, int) or isinstance(dest, int):
+            return edge
         if source != '@' and source == source.upper():
             if not source.lower() in ownedKeys:
                 return impossible
@@ -19,10 +21,17 @@ def edgeWeightFcn(ownedKeys):
         return edge
     return edgeWeight
 
+shortestSoFar = impossible
+
 def findShortest(graph: com.Graph, currentNode, ownedKeys: set, remainingKeys: set, currentSteps: int):
-    global impossible
+    global impossible, shortestSoFar
     if not bool(remainingKeys):
+        if currentSteps < shortestSoFar:
+            shortestSoFar = currentSteps
         return currentSteps
+    else:
+        if currentSteps >= shortestSoFar:
+            return impossible
 
     connected = graph.direct_connected_weights_and_edges(currentNode)
     choices = []
@@ -54,10 +63,7 @@ def connectedInDirection(grid: com.CartesianGrid, point: com.Point, direction, s
     if pointInDirection is None or pointInDirection in previouslyHit:
         return []
     previouslyHit.add(pointInDirection)
-    if pointInDirection.data != '.':
-        return [(pointInDirection.data, steps + 1)]
-    else:
-        return connectedGridElements(grid, pointInDirection, steps + 1, previouslyHit)
+    return [(pointInDirection.data, steps + 1)]
 
 def connectedGridElements(grid: com.CartesianGrid, point: com.Point, steps: int, previouslyHit: set):
     connected = []
@@ -82,12 +88,18 @@ def Part1(lines):
     KEY = 0
     DOOR = 1
     remainingKeys = set()
+    openSpaces = []
     y = 0
+    openSpaceIdx = 0
     for line in lines:
         x = 0
         for char in line.strip():
             if char != '#':
-                point = com.Point(x, y, char)
+                data = char
+                if char == '.':
+                    data = openSpaceIdx
+                    openSpaceIdx += 1
+                point = com.Point(x, y, data)
                 grid.addPoint(point)
                 if char == '@':
                     start = point
@@ -107,14 +119,15 @@ def Part1(lines):
     ownedKeys = set()
     graph = com.Graph(False, edgeWeightFcn(ownedKeys))
     for point in grid.getAllPoints():
-        if point.data == '.':
-            continue
         graph.add_node(point.data)
         previouslyHit = set()
         previouslyHit.add(point)
         connected = connectedGridElements(grid, point, 0, previouslyHit)
         for edge in connected:
             graph.add_edge(point.data, edge[0], edge[1], False)
+
+    for openSpace in range(openSpaceIdx):
+        graph.remove_node(openSpace)
     
     print(findShortest(graph, '@', ownedKeys, remainingKeys, 0))
 
