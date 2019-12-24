@@ -152,6 +152,8 @@ def Part2(lines):
     for minute in range(1, 201):
         changes = []
         for gridLvl in [key for key in grids.keys()]:
+            if abs(gridLvl) > minute:
+                continue
             for point in grids[gridLvl].getAllPoints():
                 if point.x == 2 and point.y == 2:
                     continue
