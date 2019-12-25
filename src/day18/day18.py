@@ -1,7 +1,7 @@
 import common as com
-from copy import deepcopy
+from collections import deque
 
-test = False
+test = True
 part1 = True
 part2 = False
 
@@ -23,39 +23,40 @@ def edgeWeightFcn(ownedKeys):
 
 shortestSoFar = impossible
 
-def findShortest(graph: com.Graph, currentNode, ownedKeys: set, remainingKeys: set, currentSteps: int):
-    global impossible, shortestSoFar
-    if not bool(remainingKeys):
-        if currentSteps < shortestSoFar:
-            shortestSoFar = currentSteps
-        return currentSteps
-    else:
-        if currentSteps >= shortestSoFar:
-            return impossible
+def isDoor(value):
+    return value != '@' and value != value.lower()
 
-    connected = graph.direct_connected_weights_and_edges(currentNode)
-    choices = []
-    for value in connected:
-        if value[0] != impossible:
-            choices.append(value)
+def isKey(value):
+    return value != '@' and value == value.lower()
 
-    graph.remove_node(currentNode, True)
-    
-    choicesSteps = []
-    for choice in choices:
-        node = choice[1]
-        nodesGraph = deepcopy(graph)
-        nodesOwnedKeys = deepcopy(ownedKeys)
-        nodesRemainingKeys = deepcopy(remainingKeys)
-        nodesGraph.edgeWeightFcn = edgeWeightFcn(nodesOwnedKeys)
-        if node.lower() == node:
-            nodesOwnedKeys.add(node)
-            nodesRemainingKeys.remove(node)            
+def findShortest(graph: com.Graph, currentNode, ownedKeys: set, allKeys: set, currentSteps: int):
+    pathQueue = deque()
+    alreadyHit = {}
+    alreadyHit[(currentNode, frozenset(ownedKeys))] = currentSteps
+    pathQueue.append((0,currentNode, ownedKeys))
+    allKeysHash = frozenset(allKeys).__hash__()
+    while pathQueue:
+        currentSteps, currentNode, ownedKeys = pathQueue.popleft()
+        ownedKeys = ownedKeys.copy()
+        if isKey(currentNode):
+            ownedKeys.add(currentNode)
+
+        currentOwnedKeys = frozenset(ownedKeys)
+        if allKeysHash == currentOwnedKeys.__hash__():
+            return currentSteps
+
+        for weight, edge in graph.direct_connected_weights_and_edges(currentNode):
+            if isDoor(edge) and edge.lower() not in ownedKeys:
+                continue
+            if alreadyHit.get((edge, currentOwnedKeys)):
+                continue
+            alreadyHit[(edge, currentOwnedKeys)] = currentSteps + weight
+            pathQueue.append((currentSteps + weight, edge, ownedKeys))
+    return 9999999999999999999999999999999
+
+
+
         
-        steps = findShortest(nodesGraph, node, nodesOwnedKeys, nodesRemainingKeys, currentSteps + choice[0])
-        choicesSteps.append(steps)
-    
-    return min(choicesSteps)
  
 
 def connectedInDirection(grid: com.CartesianGrid, point: com.Point, direction, steps: int, previouslyHit: set):
