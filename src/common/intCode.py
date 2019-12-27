@@ -14,6 +14,7 @@ class intCode(object):
             9: self.adjustRelativeBase,
             99: self.halt
         }
+        self.CONTINUING = -3
         self.PAUSED = -2
         self.HALTED = -1
         
@@ -161,20 +162,26 @@ class intCode(object):
     def Run(self, debug = False):
         self.paused = False
         while not self.paused:
-            rawInstruction = str(self.registers[self.instructionPointer])
-            instruction = self.instructions.get(int(rawInstruction[-2:]))
-            self.paramModes = [0, 0, 0, 0]
-            index = 0
-            for i in rawInstruction[-3::-1]:
-                self.paramModes[index] = int(i)
-                index = index + 1
-
-            if instruction is None:
-                raise Exception("invalid instruction " + str(self.registers[self.instructionPointer]))
-            result = instruction()
-            if result is self.HALTED:
-                if debug:
-                    print(self.registers)
-                return self.registers[0]
-            self.instructionPointer = self.instructionPointer + result
+            result = self.RunOneInstruction(debug)
+            if result != self.CONTINUING:
+                return result
         return self.PAUSED
+    
+    def RunOneInstruction(self, debug = False):
+        rawInstruction = str(self.registers[self.instructionPointer])
+        instruction = self.instructions.get(int(rawInstruction[-2:]))
+        self.paramModes = [0, 0, 0, 0]
+        index = 0
+        for i in rawInstruction[-3::-1]:
+            self.paramModes[index] = int(i)
+            index = index + 1
+
+        if instruction is None:
+            raise Exception("invalid instruction " + str(self.registers[self.instructionPointer]))
+        result = instruction()
+        if result is self.HALTED:
+            if debug:
+                print(self.registers)
+            return self.registers[0]
+        self.instructionPointer = self.instructionPointer + result
+        return self.CONTINUING
