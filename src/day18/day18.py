@@ -1,9 +1,10 @@
 import common as com
 from collections import deque
 
-test = True
+test = False
 part1 = True
 part2 = False
+puzzle = com.PuzzleWithTests()
 
 impossible = 999999999999999
 
@@ -12,16 +13,16 @@ def edgeWeightFcn(ownedKeys):
         global impossible
         if isinstance(source, int) or isinstance(dest, int):
             return edge
-        if source != '@' and source == source.upper():
-            if not source.lower() in ownedKeys:
-                return impossible
-        if dest != '@' and dest == dest.upper():
-            if not dest.lower() in ownedKeys:
-                return impossible
+        #if source != '@' and source == source.upper():
+        #    if not source.lower() in ownedKeys:
+        #        return impossible
+        #if dest != '@' and dest == dest.upper():
+        #    if not dest.lower() in ownedKeys:
+        #        return impossible
         return edge
     return edgeWeight
 
-shortestSoFar = impossible
+
 
 def isDoor(value):
     return value != '@' and value != value.lower()
@@ -33,31 +34,39 @@ def findShortest(graph: com.Graph, currentNode, ownedKeys: set, allKeys: set, cu
     pathQueue = deque()
     alreadyHit = {}
     alreadyHit[(currentNode, frozenset(ownedKeys))] = currentSteps
-    pathQueue.append((0,currentNode, ownedKeys))
+    keysInOrder = list()
+    pathQueue.append((currentSteps,currentNode, ownedKeys, keysInOrder))
     allKeysHash = frozenset(allKeys).__hash__()
+    shortestSoFar = impossible
+    shortestPath = None
     while pathQueue:
-        currentSteps, currentNode, ownedKeys = pathQueue.popleft()
+        currentSteps, currentNode, ownedKeys, keysInOrder = pathQueue.popleft()
         ownedKeys = ownedKeys.copy()
+        keysInOrder = keysInOrder.copy()
         if isKey(currentNode):
             ownedKeys.add(currentNode)
+            keysInOrder.extend(currentNode)
 
         currentOwnedKeys = frozenset(ownedKeys)
         if allKeysHash == currentOwnedKeys.__hash__():
-            return currentSteps
+            if shortestSoFar >= currentSteps:
+                shortestSoFar = currentSteps
+                shortestPath = keysInOrder
+                continue
+            else:
+                continue
 
         for weight, edge in graph.direct_connected_weights_and_edges(currentNode):
+            newSteps = currentSteps + weight
             if isDoor(edge) and edge.lower() not in ownedKeys:
                 continue
             if alreadyHit.get((edge, currentOwnedKeys)):
-                continue
-            alreadyHit[(edge, currentOwnedKeys)] = currentSteps + weight
-            pathQueue.append((currentSteps + weight, edge, ownedKeys))
-    return 9999999999999999999999999999999
+                if alreadyHit.get((edge, currentOwnedKeys)) < newSteps:
+                    continue
+            alreadyHit[(edge, currentOwnedKeys)] = newSteps
+            pathQueue.append((newSteps, edge, ownedKeys, keysInOrder))
+    return shortestSoFar, shortestPath
 
-
-
-        
- 
 
 def connectedInDirection(grid: com.CartesianGrid, point: com.Point, direction, steps: int, previouslyHit: set):
     pointInDirection = grid.getPoint(*(point + direction))
@@ -130,20 +139,35 @@ def Part1(lines):
     for openSpace in range(openSpaceIdx):
         graph.remove_node(openSpace)
     
-    print(findShortest(graph, '@', ownedKeys, remainingKeys, 0))
+    answer, path = findShortest(graph, '@', ownedKeys, remainingKeys, 0)
+    print(answer)
+    print(path)
+    return answer
 
 def Part2(lines):
     pass
 
-file = "input.txt"
-
 if test:
-    file = "test.txt"
-
-lines = com.readFile(file, '!')
+    lines = com.readFile("test.txt", "!")
+else:
+    #print(puzzle.input_data)
+    lines = puzzle.input_data.splitlines()
 
 if part1:
-    Part1(lines)
+    part1Answer = Part1(lines)
+    if part1Answer is None:
+        print("Returned None for part1")
+    elif test:
+        print("Part1 test result: " + str(part1Answer))
+    else:
+        puzzle.answer_a = part1Answer
+            
 
 if part2:
-    Part2(lines)
+    part2Answer = Part2(lines)
+    if part2Answer is None:
+        print("Returned None for part2")
+    elif test:
+        print("Part2 test result: " + str(part2Answer))
+    else:
+        puzzle.answer_b = part2Answer

@@ -10,7 +10,10 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "cwd": ""
+            "cwd": "${fileDirname}",
+            "envFile": "${workspaceFolder}/.env",
+            "env": {"PYTHONPATH": "${workspaceRoot}/src"},
+            "python": "C:\\Python38\\python.exe"
         }
     ]
 }
