@@ -151,6 +151,7 @@ if test:
     lines = com.readFile("test.txt", "!")
 else:
     #print(puzzle.input_data)
+    lines = com.readFile("input.txt")
     lines = puzzle.input_data.splitlines()
 
 if part1:
