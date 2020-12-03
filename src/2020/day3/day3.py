@@ -1,18 +1,36 @@
 import common as com
 
-test = True
+test = False
 part1 = True
-part2 = False
+part2 = True
 puzzle = com.PuzzleWithTests()
 
+def countTrees(lines, xStep, yStep):
+    x = y = 0
+    newLines = list()
+    for line in lines:
+        newLines.append(line.strip())
+    xLength = newLines[0].__len__()
+    yLength = newLines.__len__()
+    treesFound = 0
+    while True:
+        x = (x + xStep) % xLength
+        y = y + yStep
+        if y >= yLength:
+            break
+        possibleTree = newLines[y][x]
+        if possibleTree == "#":
+            treesFound += 1
+    return treesFound
+
 def Part1(lines):
-    return None
+    return countTrees(lines, 3, 1)
 
 def Part2(lines):
-    return None
+    return countTrees(lines, 1, 1) * countTrees(lines, 3, 1) * countTrees(lines, 5, 1) * countTrees(lines, 7, 1) * countTrees(lines, 1, 2)
 
 if test:
-    lines = com.readFile("test.txt")
+    lines = com.readFile("test.txt", "!")
 else:
     #print(puzzle.input_data)
     #lines = com.readFile("input.txt")
