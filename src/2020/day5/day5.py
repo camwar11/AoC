@@ -1,15 +1,55 @@
 import common as com
 
-test = True
-part1 = True
-part2 = False
+test = False
+part1 = False
+part2 = True
 puzzle = com.PuzzleWithTests()
 
+def halfRange(letter:str, start: int, end: int):
+    upper = letter == 'B' or letter == 'R'
+    middle = ((end - start + 1) / 2) + start
+    if upper:
+        return middle, end 
+    else:
+        return start, middle - 1
+        
+
+def getId(boardingPass: str):
+    frontOrBack = boardingPass[:7]
+    sides = boardingPass[7:10]
+    rowMin = 0
+    rowMax = 127
+    for row in frontOrBack:
+        rowMin, rowMax = halfRange(row, rowMin, rowMax)
+    colMin = 0
+    colMax = 7
+    for col in sides:
+        colMin, colMax = halfRange(col, colMin, colMax)
+    
+    print(str(rowMin) + ', ' + str(colMin))
+    return int((rowMin * 8) + colMin)
+    
+
 def Part1(lines):
-    return None
+    highestId = 0
+    for line in lines:
+        iD = getId(line)
+        if iD > highestId:
+            highestId = iD
+    return highestId
 
 def Part2(lines):
-    return None
+    ids = list()
+    for line in lines:
+        iD = getId(line)
+        ids.append(iD)
+    prev = 0
+    for sortedID in sorted(ids):
+        print(sortedID)
+        if prev != 0 and (sortedID - prev) > 1:
+            return sortedID - 1
+        prev = sortedID
+    return 0
 
 if test:
     lines = com.readFile("test.txt")
