@@ -1,15 +1,60 @@
 import common as com
 
-test = True
-part1 = True
-part2 = False
+test = False
+part1 = False
+part2 = True
 puzzle = com.PuzzleWithTests()
 
+def getYessesPart1(group):
+    yesses = dict()
+    for line in group:
+        for char in line:
+            yesses[char] = True
+    count = 0
+    for char in yesses:
+        count += 1
+    return count
+
+def getYessesPart2(group):
+    yesses = dict()
+    people = 0
+    for line in group:
+        people += 1
+        for char in line:
+            if char in yesses:
+                yesses[char] += 1 
+            else:
+                yesses[char] = 1
+    count = 0
+    for char in yesses:
+        if yesses[char] == people:
+            count += 1
+    return count
+
+
 def Part1(lines):
-    return None
+    total = 0
+    group = list()
+    for line in lines:
+        if line.strip() == '':
+            total += getYessesPart1(group)
+            group.clear()
+        else:
+            group.append(line.strip())
+    total += getYessesPart1(group)
+    return total
 
 def Part2(lines):
-    return None
+    total = 0
+    group = list()
+    for line in lines:
+        if line.strip() == '':
+            total += getYessesPart2(group)
+            group.clear()
+        else:
+            group.append(line.strip())
+    total += getYessesPart2(group)
+    return total
 
 if test:
     lines = com.readFile("test.txt")
