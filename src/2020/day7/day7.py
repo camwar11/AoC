@@ -1,11 +1,32 @@
 import common as com
+import re
 
 test = True
 part1 = True
 part2 = False
 puzzle = com.PuzzleWithTests()
 
-def Part1(lines):
+def getBagType(predicate: str):
+    return predicate[:predicate.find(' bags')]
+
+def Part1(lines, startingBag):
+    bagGraph = com.Graph()
+    bagsToGraphNodes = dict()
+    bagGraph.add_node(startingBag)
+    bagGraph.
+    for line in lines:
+        bagType, contains = line.split('contain')
+        bagType = getBagType(bagType)
+        if 'no other bags' not in contains:
+            insideBags = contains.split(',')
+            for insideBag in insideBags:
+                number, insideBagType = re.findall('(\d+) (.*? .*?) bag', insideBag)[0]
+                if bagType not in bagsToGraphNodes:
+
+                    bagRules[bagType] = list()
+                bagRules[bagType].append((int(number), insideBagType))
+
+
     return None
 
 def Part2(lines):

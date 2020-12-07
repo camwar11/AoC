@@ -12,6 +12,9 @@ class Graph(object):
         existing = self.__graph.get(node)
         if existing is None:
             self.__graph[node] = {}
+    
+    def get_node(self, node):
+        return self.__graph.get(node)
 
     def remove_node(self, node, reattachEnds = True):
         connected = self.__graph.get(node)
@@ -41,7 +44,7 @@ class Graph(object):
     
     def add_edge(self, source, destination, edgeInfo, addReverse = None):
         if addReverse is None:
-            addRevers = not self.directed
+            addReverse = not self.directed
         self.__add_edge_impl(source, destination, edgeInfo, addReverse)
 
     def direct_connected_weights_and_edges(self, source):
