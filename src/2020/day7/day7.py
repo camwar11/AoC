@@ -3,13 +3,23 @@ import re
 
 test = False
 part1 = True
-part2 = False
+part2 = True
 puzzle = com.PuzzleWithTests()
 
 def getBagType(predicate: str):
     return predicate[:predicate.find(' bags')]
 
-def Part1(lines, startingBag):
+def walkBagNodes(foundNodes, bagGraph, currentNode, multiplier):
+    count = multiplier
+    edgesAndWeights = bagGraph.direct_connected_weights_and_edges(currentNode)
+    for edge in edgesAndWeights:
+        foundNodes.add(edge)
+        insideBagCount = edgesAndWeights[edge]
+        count += walkBagNodes(foundNodes, bagGraph, edge, insideBagCount * multiplier)
+    return count
+
+
+def CountBags(lines, startingBag, part1):
     bagGraph = com.Graph()
     bagGraph.add_node(startingBag)
     for line in lines:
@@ -21,26 +31,22 @@ def Part1(lines, startingBag):
             for insideBag in insideBags:
                 number, insideBagType = re.findall('(\d+) (.*? .*?) bag', insideBag)[0]
                 bagGraph.add_node(insideBagType)
-                bagGraph.add_edge(insideBagType, bagType, int(number))
-    #print(bagGraph)
+                if part1:
+                    bagGraph.add_edge(insideBagType, bagType, 1)
+                else:
+                    bagGraph.add_edge(bagType, insideBagType, int(number))
     foundNodes = set()
-    nodesToWalk = list()
-    nodesToWalk.append(startingBag)
+    total = walkBagNodes(foundNodes, bagGraph, startingBag, 1)
+    if part1:
+        return foundNodes.__len__()
+    else:
+        return total - 1
 
-    while nodesToWalk:
-        newNodes = list(nodesToWalk)
-        nodesToWalk.clear()
-        for node in newNodes:
-            if node != startingBag:
-                foundNodes.add(node)
-            for edge in bagGraph.direct_connected_weights_and_edges(node):
-                if edge not in foundNodes:
-                    nodesToWalk.append(edge)
+def Part1(lines, startingBag):
+    return CountBags(lines, startingBag, True)
 
-    return foundNodes.__len__()
-
-def Part2(lines):
-    return None
+def Part2(lines, startingBag):
+    return CountBags(lines, startingBag, False)
 
 if test:
     lines = com.readFile("test.txt")
@@ -60,7 +66,7 @@ if part1:
             
 
 if part2:
-    part2Answer = Part2(lines)
+    part2Answer = Part2(lines, 'shiny gold')
     if part2Answer is None:
         print("Returned None for part2")
     elif test:
