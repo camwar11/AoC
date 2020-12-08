@@ -1,15 +1,31 @@
 import common as com
 
-test = True
+test = False
 part1 = True
-part2 = False
+part2 = True
 puzzle = com.PuzzleWithTests()
 
 def Part1(lines):
-    return None
+    console = com.gameConsole()
+    output, haltedNormally = console.runProgram(lines)
+    return output
 
 def Part2(lines):
-    return None
+    console = com.gameConsole()
+    haltedNormally = False
+    idx = 0
+    while not haltedNormally:
+        newLines = list(lines)
+        if lines[idx].startswith('jmp'):
+            newLines[idx] = newLines[idx].replace('jmp', 'nop')
+        elif lines[idx].startswith('nop'):
+            newLines[idx] = newLines[idx].replace('nop', 'jmp')
+        else:
+            idx += 1
+            continue
+        output, haltedNormally = console.runProgram(newLines)
+        idx += 1
+    return output
 
 if test:
     lines = com.readFile("test.txt")
