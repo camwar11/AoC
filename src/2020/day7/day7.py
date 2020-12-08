@@ -1,7 +1,7 @@
 import common as com
 import re
 
-test = True
+test = False
 part1 = True
 part2 = False
 puzzle = com.PuzzleWithTests()
@@ -11,23 +11,33 @@ def getBagType(predicate: str):
 
 def Part1(lines, startingBag):
     bagGraph = com.Graph()
-    bagsToGraphNodes = dict()
     bagGraph.add_node(startingBag)
-    bagGraph.
     for line in lines:
         bagType, contains = line.split('contain')
         bagType = getBagType(bagType)
         if 'no other bags' not in contains:
+            bagGraph.add_node(bagType)
             insideBags = contains.split(',')
             for insideBag in insideBags:
                 number, insideBagType = re.findall('(\d+) (.*? .*?) bag', insideBag)[0]
-                if bagType not in bagsToGraphNodes:
+                bagGraph.add_node(insideBagType)
+                bagGraph.add_edge(insideBagType, bagType, int(number))
+    #print(bagGraph)
+    foundNodes = set()
+    nodesToWalk = list()
+    nodesToWalk.append(startingBag)
 
-                    bagRules[bagType] = list()
-                bagRules[bagType].append((int(number), insideBagType))
+    while nodesToWalk:
+        newNodes = list(nodesToWalk)
+        nodesToWalk.clear()
+        for node in newNodes:
+            if node != startingBag:
+                foundNodes.add(node)
+            for edge in bagGraph.direct_connected_weights_and_edges(node):
+                if edge not in foundNodes:
+                    nodesToWalk.append(edge)
 
-
-    return None
+    return foundNodes.__len__()
 
 def Part2(lines):
     return None
@@ -40,7 +50,7 @@ else:
     lines = puzzle.input_data.splitlines()
 
 if part1:
-    part1Answer = Part1(lines)
+    part1Answer = Part1(lines, 'shiny gold')
     if part1Answer is None:
         print("Returned None for part1")
     elif test:

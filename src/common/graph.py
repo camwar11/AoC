@@ -8,9 +8,14 @@ class Graph(object):
         self.directed = directed
         self.edgeWeightFcn = edgeWeightFcn
     
+    def __str__(self):
+        return self.__graph.__str__()
+
+    def __contains__(self, node):
+        return self.get_node(node) is not None
+    
     def add_node(self, node):
-        existing = self.__graph.get(node)
-        if existing is None:
+        if node not in self:
             self.__graph[node] = {}
     
     def get_node(self, node):

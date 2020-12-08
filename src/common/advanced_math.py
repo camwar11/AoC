@@ -1,5 +1,5 @@
-from fractions import gcd
+import math
 from functools import reduce
 
 def lcm(numbers):
-    return reduce(lambda x, y: (x*y)/gcd(x,y), numbers, 1)
+    return reduce(lambda x, y: (x*y)/math.gcd(x,y), numbers, 1)
