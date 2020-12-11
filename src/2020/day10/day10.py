@@ -1,15 +1,57 @@
 import common as com
+from math import factorial
 
 test = True
-part1 = True
-part2 = False
+part1 = False
+part2 = True
 puzzle = com.PuzzleWithTests()
 
 def Part1(lines):
-    return None
+    minVoltageGap = 1
+    maxVoltageGap = 3
+    voltages = list()
+    for line in lines:
+        voltages.append(int(line.strip()))
+    
+    sortedAdapters = sorted(voltages)
+    threeGaps = 0
+    oneGaps = 0
+    prev = 0
+    for adapter in sortedAdapters:
+        diff = adapter - prev
+        if diff == 3:
+            threeGaps += 1
+        elif diff == 1:
+            oneGaps +=1
+        prev = adapter
+    return oneGaps * (threeGaps+1)
 
 def Part2(lines):
-    return None
+    minVoltageGap = 1
+    maxVoltageGap = 3
+    voltages = list()
+    for line in lines:
+        voltages.append(int(line.strip()))
+    
+    sortedAdapters = sorted(voltages)
+    threeGaps = 0
+    oneGaps = 0
+    prev = 0
+    diffs = list()
+    for adapter in sortedAdapters:
+        diff = adapter - prev
+        diffs.append(diff)
+        prev = adapter
+    total = 1
+    onesInARow = 0
+    for diff in diffs:
+        if diff == 1:
+            onesInARow += 1
+        else:
+            if onesInARow != 0:
+                total *= 2**(onesInARow-1)
+                onesInARow = 0
+    return total
 
 if test:
     lines = com.readFile("test.txt")
