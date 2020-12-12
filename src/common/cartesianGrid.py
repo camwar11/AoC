@@ -1,5 +1,5 @@
 import math
-from operator import add
+from operator import add, sub
 import common.utilityfunctions as util
 
 class Point(object):
@@ -12,9 +12,14 @@ class Point(object):
         return str(self.data)
     
     def __add__(self, other):
-        if other is Point:
+        if isinstance(other, Point):
             other = [other.x, other.y]
         return util.vector_math(add, [self.x, self.y], other)
+
+    def __sub__(self, other):
+        if isinstance(other, Point):
+            other = [other.x, other.y]
+        return util.vector_math(sub, [self.x, self.y], other)
         
     
     def setGrid(self, grid):
@@ -30,6 +35,11 @@ class Point(object):
         if self.grid is None:
             raise AttributeError("point is not part of a grid")
         self.grid.movePoint(self, xDiff, yDiff)
+    
+    def moveTo(self, newX, newY):
+        if self.grid is None:
+            raise AttributeError("point is not part of a grid")
+        self.grid.movePointTo(self, newX, newY)
 
 
 def defaultCellOutputStr(cell):
@@ -59,6 +69,13 @@ class CartesianGrid(object):
         del xAxis[point.y]
         point.x += xDiff
         point.y += yDiff
+        self.addPoint(point)
+    
+    def movePointTo(self, point, newX, newY):
+        xAxis = self.grid.get(point.x)
+        del xAxis[point.y]
+        point.x = newX
+        point.y = newY
         self.addPoint(point)
     
     def movePointViaCoords(self, oldX, oldY, xDiff, yDiff):

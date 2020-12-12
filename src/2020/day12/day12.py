@@ -1,12 +1,14 @@
+from math import cos, radians, sin
 from operator import mul
+from typing import SupportsFloat
 import common as com
 
 test = False
-part1 = True
-part2 = False
+part1 = False
+part2 = True
 puzzle = com.PuzzleWithTests()
 
-class ship(object):
+class waterVessel(object):
     def __init__(self):
         self.NORTH = 0
         self.EAST = 90
@@ -101,7 +103,7 @@ class ship(object):
 
 def Part1(lines):
     grid = com.CartesianGrid()
-    myShip = ship()
+    myShip = waterVessel()
     shipPoint = com.Point(0,0,myShip)
     grid.addPoint(shipPoint)
     myShip.setPoint(shipPoint)
@@ -125,8 +127,59 @@ def Part1(lines):
             myShip.moveForward(units)
     return shipPoint.ManhattenDistance(com.Point(0,0,None))
 
+def rotateWaypoint(refPoint: com.Point, angleDegs:SupportsFloat, point: com.Point):
+    # flip the angle so that it rotates clockwise instead of ccw
+    angleDegs *= -1
+    sine = sin(radians(angleDegs))
+    cosine = cos(radians(angleDegs))
+
+    # translate point back to refPoint
+    point.move(-refPoint.x, -refPoint.y)
+
+    # rotate point
+    newX = point.x * cosine - point.y * sine
+    newY = point.x * sine + point.y * cosine
+
+    # translate point back
+    point.moveTo(int(round(newX + refPoint.x)), int(round(newY + refPoint.y)))
+
 def Part2(lines):
-    return None
+    grid = com.CartesianGrid()
+    myShip = waterVessel()
+    shipPoint = com.Point(0,0,myShip)
+    grid.addPoint(shipPoint)
+    myShip.setPoint(shipPoint)
+    waypoint = waterVessel()
+    waypointPoint = com.Point(10,1,waypoint)
+    grid.addPoint(waypointPoint)
+    waypoint.setPoint(waypointPoint)
+    origin = com.Point(0,0, None)
+    grid.addPoint(origin)
+    for line in lines:
+        command = line[0]
+        units = int(line[1:].strip())
+        if command == 'N':
+            waypoint.moveNorth(units)
+        elif command == 'E':
+            waypoint.moveEast(units)
+        elif command == 'S':
+            waypoint.moveSouth(units)
+        elif command == 'W':
+            waypoint.moveWest(units)
+        elif command == 'L':
+            # turning left should be the same as moving negative degrees
+            rotateWaypoint(origin, -units, waypointPoint)
+        elif command == 'R':
+            rotateWaypoint(origin, units, waypointPoint)
+        elif command == 'F':
+            print('ship ' + str(shipPoint.x) + ', ' + str(shipPoint.y))
+            print('waypoint ' + str(waypointPoint.x) + ', ' + str(waypointPoint.y))
+            scaledVector = com.util.vector_math(mul, [waypointPoint.x, waypointPoint.y], [units, units])
+            print('scaledVector ' + str(scaledVector[0]) + ', ' + str(scaledVector[1]))
+            shipPoint.move(*scaledVector)
+            # don't actually need to move the waypoint as it's always relative to the ship
+            print('movedShip ' + str(shipPoint.x) + ', ' + str(shipPoint.y))
+    return shipPoint.ManhattenDistance(com.Point(0,0,None))
 
 if test:
     lines = com.readFile("test.txt")
