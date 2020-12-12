@@ -26,6 +26,12 @@ class Point(object):
     def AngleBetweenPoints(self, otherPoint):
         return CartesianGrid.Angle(self.x, otherPoint.x, self.y, otherPoint.y)
 
+    def move(self, xDiff, yDiff):
+        if self.grid is None:
+            raise AttributeError("point is not part of a grid")
+        self.grid.movePoint(self, xDiff, yDiff)
+
+
 def defaultCellOutputStr(cell):
         return str(cell)
 
@@ -47,6 +53,16 @@ class CartesianGrid(object):
         
         xAxis[point.y] = point
         point.setGrid(self)
+
+    def movePoint(self, point, xDiff, yDiff):
+        xAxis = self.grid.get(point.x)
+        del xAxis[point.y]
+        point.x += xDiff
+        point.y += yDiff
+        self.addPoint(point)
+    
+    def movePointViaCoords(self, oldX, oldY, xDiff, yDiff):
+        self.movePoint(self.getPoint(oldX, oldY), xDiff, yDiff)
     
     def getPoint(self, x, y):
         xAxis = self.grid.get(x)
