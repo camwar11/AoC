@@ -1,12 +1,26 @@
 import common as com
 
-test = True
+test = False
 part1 = True
 part2 = False
 puzzle = com.PuzzleWithTests()
 
 def Part1(lines):
-    return None
+    timestamp = int(lines[0])
+    busses = list()
+    for bus in lines[1].split(','):
+        if bus.strip() == 'x':
+            continue
+        busses.append(int(bus))
+    
+    bestBus = 0
+    bestWait = 99999999999999999999
+    for bus in busses:
+        wait = bus - (timestamp % bus)
+        if wait < bestWait:
+            bestWait = wait
+            bestBus = bus
+    return bestBus * bestWait
 
 def Part2(lines):
     return None
