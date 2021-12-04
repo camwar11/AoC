@@ -9,6 +9,7 @@
             "command": "bash",
             "args": [
                 "./createDay.sh",
+                "${input:year}",
                 "${input:day}"
             ],
             "problemMatcher": []
@@ -20,12 +21,18 @@
             "args": [
                 "-executionpolicy",
                 "bypass",
-                "./measureDay.ps1 ${input:day}",
+                "./measureDay.ps1 ${input:year} ${input:day}",
             ],
             "problemMatcher": []
         }
     ],
     "inputs": [
+        {
+            "id": "year",
+            "type": "promptString",
+            "default": "year",
+            "description": "Enter year"
+        },
         {
             "id": "day",
             "type": "promptString",
