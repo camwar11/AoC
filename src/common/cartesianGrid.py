@@ -50,10 +50,11 @@ class CartesianGrid(object):
     RIGHT = [1, 0]
     DOWN = [0, -1]
     LEFT = [-1, 0]
-    def __init__(self, emptyCellOutput = '.', cellOutputStrFcn = defaultCellOutputStr):
+    def __init__(self, emptyCellOutput = '.', cellOutputStrFcn = defaultCellOutputStr, flipOutput = False):
         self.grid = {}
         self.emptyCellOutput = emptyCellOutput
         self.cellOutputStrFcn = cellOutputStrFcn
+        self.flipOutput = flipOutput
     
     def addPoint(self, point):
         xAxis = self.grid.get(point.x)
@@ -63,6 +64,7 @@ class CartesianGrid(object):
         
         xAxis[point.y] = point
         point.setGrid(self)
+        return point
 
     def movePoint(self, point, xDiff, yDiff):
         xAxis = self.grid.get(point.x)
@@ -130,7 +132,10 @@ class CartesianGrid(object):
                 if maxY is None or y > maxY:
                     maxY = y
         
-        for y in range(maxY, minY - 1, -1):
+        yRange = range(maxY, minY - 1, -1)
+        if self.flipOutput:
+            yRange = range(minY, maxY + 1, 1)
+        for y in yRange:
             for x in range(minX, maxX + 1):
                 yAxis = self.grid.get(x)
                 if yAxis is None:
