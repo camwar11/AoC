@@ -1,4 +1,3 @@
-from re import T
 import common as com
 
 test = False
