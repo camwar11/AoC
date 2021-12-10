@@ -88,6 +88,19 @@ class CartesianGrid(object):
         if xAxis is not None:
             return xAxis.get(y)
         return None
+
+    def getAdjacentPoints(self, x, y):
+        points = list()
+        point = self.getPoint(x, y)
+        if not point:
+            return points
+
+        for direction in CartesianGrid.CardinalDirections():
+            newX, newY = point + direction
+            newPoint = self.getPoint(newX, newY)
+            if newPoint:
+                points.append(newPoint)
+        return points
     
     def getAllPoints(self):
         minX = None
@@ -158,4 +171,8 @@ class CartesianGrid(object):
         y = (y2 - y1)
         x = (x2 - x1)
         return math.atan2(y, x)
+
+    @staticmethod
+    def CardinalDirections() -> list:
+        return [CartesianGrid.UP, CartesianGrid.RIGHT, CartesianGrid.DOWN, CartesianGrid.LEFT]
         
