@@ -50,6 +50,12 @@ class CartesianGrid(object):
     RIGHT = [1, 0]
     DOWN = [0, -1]
     LEFT = [-1, 0]
+
+    UP_LEFT = [-1, 1]
+    UP_RIGHT = [1, 1]
+    DOWN_LEFT = [-1, -1]
+    DOWN_RIGHT = [1, -1]
+
     def __init__(self, emptyCellOutput = '.', cellOutputStrFcn = defaultCellOutputStr, flipOutput = False):
         self.grid = {}
         self.emptyCellOutput = emptyCellOutput
@@ -89,20 +95,25 @@ class CartesianGrid(object):
             return xAxis.get(y)
         return None
 
-    def getAdjacentPoints(self, x, y):
+    def getAdjacentPoints(self, x, y, includeDiagonals = False):
         points = list()
         point = self.getPoint(x, y)
         if not point:
             return points
 
-        for direction in CartesianGrid.CardinalDirections():
+        if includeDiagonals:
+            directions = CartesianGrid.AllDirections()
+        else:
+            directions = CartesianGrid.CardinalDirections()
+
+        for direction in directions:
             newX, newY = point + direction
             newPoint = self.getPoint(newX, newY)
             if newPoint:
                 points.append(newPoint)
         return points
     
-    def getAllPoints(self):
+    def getAllPoints(self, lowYFirst = False):
         minX = None
         maxX = None
         minY = None
@@ -119,7 +130,11 @@ class CartesianGrid(object):
                 if maxY is None or y > maxY:
                     maxY = y
         
-        for y in range(maxY, minY - 1, -1):
+        yRange = range(maxY, minY -1, -1)
+        if lowYFirst:
+            yRange = range(minY, maxY + 1)
+
+        for y in yRange:
             for x in range(minX, maxX + 1):
                 yAxis = self.grid.get(x)
                 if yAxis is not None:
@@ -175,4 +190,12 @@ class CartesianGrid(object):
     @staticmethod
     def CardinalDirections() -> list:
         return [CartesianGrid.UP, CartesianGrid.RIGHT, CartesianGrid.DOWN, CartesianGrid.LEFT]
+    
+    @staticmethod
+    def DiagonalDirections() -> list:
+        return [CartesianGrid.UP_LEFT, CartesianGrid.UP_RIGHT, CartesianGrid.DOWN_LEFT, CartesianGrid.DOWN_RIGHT]
+
+    @staticmethod
+    def AllDirections() -> list:
+        return CartesianGrid.CardinalDirections() + CartesianGrid.DiagonalDirections()
         
