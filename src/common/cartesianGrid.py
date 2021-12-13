@@ -1,5 +1,6 @@
 import math
 from operator import add, sub
+from typing import List
 import common.utilityfunctions as util
 
 class Point(object):
@@ -71,6 +72,13 @@ class CartesianGrid(object):
         xAxis[point.y] = point
         point.setGrid(self)
         return point
+    
+    def removePoint(self, point):
+        xAxis = self.grid.get(point.x)
+        if point.y in xAxis:
+            del xAxis[point.y]
+        if len(self.grid.get(point.x)) == 0:
+            del self.grid[point.x]
 
     def movePoint(self, point, xDiff, yDiff):
         xAxis = self.grid.get(point.x)
@@ -82,6 +90,8 @@ class CartesianGrid(object):
     def movePointTo(self, point, newX, newY):
         xAxis = self.grid.get(point.x)
         del xAxis[point.y]
+        if len(self.grid.get(point.x)) == 0:
+            del self.grid[point.x]
         point.x = newX
         point.y = newY
         self.addPoint(point)
@@ -113,7 +123,7 @@ class CartesianGrid(object):
                 points.append(newPoint)
         return points
     
-    def getAllPoints(self, lowYFirst = False):
+    def getAllPoints(self, lowYFirst = False) -> List[Point]:
         minX = None
         maxX = None
         minY = None
