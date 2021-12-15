@@ -26,3 +26,10 @@ def vector_math(operator, first, second):
         else:
             result.append(operator(first[index], second[index])) 
     return result
+
+def increment_dict(dictionary: dict, key, increment: int):
+    count = 0
+    if key in dictionary:
+        count = dictionary[key]
+    count += increment
+    dictionary[key] = count
