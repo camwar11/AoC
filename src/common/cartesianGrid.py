@@ -208,4 +208,17 @@ class CartesianGrid(object):
     @staticmethod
     def AllDirections() -> list:
         return CartesianGrid.CardinalDirections() + CartesianGrid.DiagonalDirections()
-        
+
+def parse_to_grid(lines: List[str], grid: CartesianGrid, conversionFcn = None):
+    y = 0
+    for line in lines:
+        x = 0
+        line = line.strip()
+        for char in line:
+            if conversionFcn:
+                point = Point(x, y, conversionFcn(char))
+            else:
+                point = Point(x, y, char)
+            grid.addPoint(point)
+            x += 1
+        y += 1
