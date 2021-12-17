@@ -1,7 +1,13 @@
+from typing import Sequence, Tuple
+
+
 def divide_chunks(list, length): 
     # looping till length l 
     for i in range(0, len(list), length):  
         yield list[i:i + length]
+
+def split_seq(seq: Sequence, length: int) -> Tuple[Sequence, Sequence]: 
+    return seq[:length], seq[length:]
 
 def binary_search(low, high, closureToRun, targetValueIsHigher, targetValueIsLower):
     while(low < high):
@@ -33,3 +39,8 @@ def increment_dict(dictionary: dict, key, increment: int):
         count = dictionary[key]
     count += increment
     dictionary[key] = count
+
+def hex2bin_leading_zeros(hex: str) -> str:
+    binDigitsInHexDigit = 4
+    size = len(hex) * binDigitsInHexDigit
+    return (bin(int(hex, 16))[2:]).zfill(size)
