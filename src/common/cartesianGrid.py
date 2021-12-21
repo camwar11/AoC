@@ -83,6 +83,8 @@ class CartesianGrid(object):
     def movePoint(self, point, xDiff, yDiff):
         xAxis = self.grid.get(point.x)
         del xAxis[point.y]
+        if len(self.grid.get(point.x)) == 0:
+            del self.grid[point.x]
         point.x += xDiff
         point.y += yDiff
         self.addPoint(point)
@@ -105,7 +107,7 @@ class CartesianGrid(object):
             return xAxis.get(y)
         return None
 
-    def getAdjacentPoints(self, x, y, includeDiagonals = False):
+    def getAdjacentPoints(self, x, y, includeDiagonals = False, includeMissing = False):
         points = list()
         point = self.getPoint(x, y)
         if not point:
@@ -121,6 +123,8 @@ class CartesianGrid(object):
             newPoint = self.getPoint(newX, newY)
             if newPoint:
                 points.append(newPoint)
+            elif includeMissing:
+                points.append(Point(newX, newY, None))
         return points
     
     def getAllPoints(self, lowYFirst = False) -> List[Point]:
@@ -153,12 +157,11 @@ class CartesianGrid(object):
                         allPoints.append(value)
         return allPoints
 
-    def __str__(self):
+    def getBounds(self):
         minX = None
         maxX = None
         minY = None
         maxY = None
-        string = ''
         for x in self.grid.keys():
             if minX is None or x < minX:
                 minX = x
@@ -169,7 +172,11 @@ class CartesianGrid(object):
                     minY = y
                 if maxY is None or y > maxY:
                     maxY = y
-        
+        return minX, maxX, minY, maxY
+
+    def __str__(self):
+        string = ''
+        minX, maxX, minY, maxY = self.getBounds()
         yRange = range(maxY, minY - 1, -1)
         if self.flipOutput:
             yRange = range(minY, maxY + 1, 1)
@@ -186,6 +193,10 @@ class CartesianGrid(object):
                         string = string + self.cellOutputStrFcn(value)
             string = string + '\n'
         return string
+    
+    def moveAllPoints(self, xDiff: int, yDiff: int):
+        for point in self.getAllPoints():
+            self.movePoint(point, xDiff, yDiff)
     
     @staticmethod
     def ManhattenDistance(x1, x2, y1, y2):
@@ -207,7 +218,7 @@ class CartesianGrid(object):
 
     @staticmethod
     def AllDirections() -> list:
-        return CartesianGrid.CardinalDirections() + CartesianGrid.DiagonalDirections()
+        return [CartesianGrid.UP_LEFT, CartesianGrid.UP, CartesianGrid.UP_RIGHT, CartesianGrid.LEFT, CartesianGrid.RIGHT, CartesianGrid.DOWN_LEFT, CartesianGrid.DOWN, CartesianGrid.DOWN_RIGHT]
 
 def parse_to_grid(lines: List[str], grid: CartesianGrid, conversionFcn = None):
     y = 0
