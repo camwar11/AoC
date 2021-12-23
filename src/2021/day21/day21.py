@@ -4,7 +4,7 @@ from typing import List, Optional, Set, Tuple, Union
 import common as com
 import copy
 
-test = True
+test = False
 part1 = False
 part2 = True
 puzzle = com.PuzzleWithTests()
@@ -61,7 +61,7 @@ def Part1(lines: List[str]):
     return losingScore * numberOfRollsSoFar
 
 @functools.lru_cache(None)
-def getWinners(playerNum: int, turnRollTotal: int, positions: Tuple[int, int], scores: Tuple[int, int]):
+def playQuantumGame(playerNum: int, turnRollTotal: int, positions: Tuple[int, int], scores: Tuple[int, int]):
     global quantumRollCounts
     positionsList = list(positions)
     scoresList = list(scores)
@@ -73,37 +73,19 @@ def getWinners(playerNum: int, turnRollTotal: int, positions: Tuple[int, int], s
     positionsList[playerNum] = position
     scoresList[playerNum] += position
     winner = list()
-    winner[0] = 0
-    winner[1] = 0
-    while True:
-        if scoresList[playerNum] >= 21:
-            winner[playerNum] += quantumRollCounts[turnRollTotal]
-            return tuple(winner)
-        else:
-            playerNum = (playerNum + 1) % 2
-            for roll in quantumRollCounts:
-                count = quantumRollCounts[roll]
-                childWinner = getWinners(playerNum, roll, tuple(positionsList), tuple(scoresList))
-                winner[0] += childWinner[0]
-                winner[1] += childWinner[1] 
-
-
-
-
-def playQuantumGame(playerNum: int, turnRollTotal: int, position0: int, position1: int, scores: List[int], winners: List[int]):
-    numDieRolls = 3
-    while(True):
-        if turnRollNum < 3:
-            for dieRoll in range(numDieRolls):
-                playQuantumGame(playerNum, turnRollNum + 1, turnRollTotal + dieRoll, copy.copy(positions), copy.copy(scores), winners)
-        elif turnRollNum == 3:
-            move_and_score(playerNum, turnRollTotal, positions, scores)
-            if scores[playerNum] >= 21:
-                winners[playerNum] += 1
-                return
-            playerNum = (playerNum + 1) % 2
-            turnRollNum = 1
-            turnRollTotal = 0
+    winner.append(0)
+    winner.append(0)
+    if scoresList[playerNum] >= 21:
+        winner[playerNum] += 1
+        return tuple(winner)
+    else:
+        playerNum = (playerNum + 1) % 2
+        for roll in quantumRollCounts:
+            count = quantumRollCounts[roll]
+            childWinners = playQuantumGame(playerNum, roll, tuple(positionsList), tuple(scoresList))
+            winner[0] += childWinners[0] * count
+            winner[1] += childWinners[1] * count
+        return tuple(winner)
 
 def Part2(lines):
     playerPositions = list()
@@ -115,11 +97,12 @@ def Part2(lines):
         playerScores.append(0)
         winners.append(0)
 
-    numDieRolls = 3
-    dieRoll = 0
     playerNum = 0
-    numberOfRollsSoFar = 0
-    playQuantumGame(playerNum, 0, 0, playerPositions, playerScores, winners)
+    for roll in quantumRollCounts:
+        count = quantumRollCounts[roll]
+        childWinners = playQuantumGame(playerNum, roll, tuple(playerPositions), tuple(playerScores))
+        winners[0] += childWinners[0] * count
+        winners[1] += childWinners[1] * count
     return max(winners)
 
 if test:
