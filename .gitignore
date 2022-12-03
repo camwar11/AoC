@@ -102,3 +102,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# AoC Inputs
+puzzle.md
+**/src/inputs
