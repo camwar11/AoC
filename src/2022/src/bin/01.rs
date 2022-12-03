@@ -1,13 +1,11 @@
 pub fn part_one(input: &str) -> Option<u32> {
     let mut current_value = 0;
-    let mut largest = (0u32 ,0u32);
-    let mut index = 0;
+    let mut largest = 0u32;
     for line in input.lines() {
         if line.is_empty() {
-            if current_value > largest.0 {
-                largest = (current_value, index)
+            if current_value > largest {
+                largest = current_value;
             }
-            index += 1;
             current_value = 0;
             continue;
         }
@@ -16,11 +14,24 @@ pub fn part_one(input: &str) -> Option<u32> {
         current_value += calories;
     }
 
-    Some(largest.0)
+    Some(largest)
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    None
+    let mut current_value = 0;
+    let mut values = std::collections::BTreeSet::new();
+    for line in input.lines() {
+        if line.is_empty() {
+            values.insert(current_value);
+            current_value = 0;
+            continue;
+        }
+
+        let calories: u32 = line.parse().unwrap();
+        current_value += calories;
+    }
+
+    Some(values.iter().rev().take(3).sum())
 }
 
 fn main() {
@@ -42,6 +53,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let input = advent_of_code::read_file("examples", 1);
-        assert_eq!(part_two(&input), None);
+        assert_eq!(part_two(&input), Some(45000));
     }
 }

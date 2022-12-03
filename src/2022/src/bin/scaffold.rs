@@ -28,13 +28,13 @@ mod tests {
     #[test]
     fn test_part_one() {
         let input = advent_of_code::read_file("examples", DAY);
-        assert_eq!(part_one(&input), None);
+        assert_eq!(part_one(&input), Some(0));
     }
 
     #[test]
     fn test_part_two() {
         let input = advent_of_code::read_file("examples", DAY);
-        assert_eq!(part_two(&input), None);
+        assert_eq!(part_two(&input), Some(0));
     }
 }
 "###;

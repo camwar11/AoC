@@ -1,0 +1,175 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'advent_of_code'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=advent_of_code"
+                ],
+                "filter": {
+                    "name": "advent_of_code",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'advent_of_code'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=advent_of_code",
+                    "--package=advent_of_code"
+                ],
+                "filter": {
+                    "name": "advent_of_code",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'advent_of_code'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=advent_of_code",
+                    "--package=advent_of_code"
+                ],
+                "filter": {
+                    "name": "advent_of_code",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable '01'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=01",
+                    "--package=advent_of_code"
+                ],
+                "filter": {
+                    "name": "01",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable '01'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=01",
+                    "--package=advent_of_code"
+                ],
+                "filter": {
+                    "name": "01",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'download'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=download",
+                    "--package=advent_of_code"
+                ],
+                "filter": {
+                    "name": "download",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'download'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=download",
+                    "--package=advent_of_code"
+                ],
+                "filter": {
+                    "name": "download",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'scaffold'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=scaffold",
+                    "--package=advent_of_code"
+                ],
+                "filter": {
+                    "name": "scaffold",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'scaffold'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=scaffold",
+                    "--package=advent_of_code"
+                ],
+                "filter": {
+                    "name": "scaffold",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
