@@ -40,3 +40,30 @@ pub fn intersection_full<T>(values: Vec<HashSet<T>> ) -> Option<HashSet<T>> wher
 
     Some(intersection)
 }
+
+pub fn open_in_code(path: &str) -> bool {
+    use std::io::Write;
+    
+    let code_exe = which::which("code").unwrap_or("code".into());
+
+    match std::process::Command::new(&code_exe).arg(path.to_string()).output() {
+        Ok(cmd_output) => {
+            std::io::stdout()
+                .write_all(&cmd_output.stdout)
+                .expect("could not write cmd stdout to pipe.");
+            std::io::stderr()
+                .write_all(&cmd_output.stderr)
+                .expect("could not write cmd stderr to pipe.");
+            if !cmd_output.status.success() {
+                eprintln!("code exited with an error");
+                return false;
+            }
+            true
+
+        }
+        Err(e) => {
+            eprintln!("failed to spawn code: {}", e);
+            false
+        }
+    }
+}

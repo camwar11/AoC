@@ -7,6 +7,8 @@ use std::path::PathBuf;
 use std::{env::temp_dir, io, process::Command};
 use std::{fs, process};
 
+use advent_of_code::helpers::open_in_code;
+
 struct Args {
     day: u8,
     year: Option<i16>,
@@ -49,6 +51,7 @@ fn main() {
 
     let day_padded = format!("{:02}", args.day);
     let input_path = format!("src/inputs/{}.txt", day_padded);
+    let puzzle_path = format!("src/inputs/puzzle_{}.md", day_padded);
 
     // check if aoc binary exists and is callable.
     if Command::new("aoc").arg("-V").output().is_err() {
@@ -66,6 +69,8 @@ fn main() {
     cmd_args.append(&mut vec![
         "--input-file".into(),
         tmp_file_path.to_string_lossy().to_string(),
+        "--puzzle-file".into(),
+        puzzle_path.to_string(),
         "--day".into(),
         args.day.to_string(),
         "download".into(),
@@ -95,11 +100,12 @@ fn main() {
         Ok(_) => {
             println!("---");
             println!("🎄 Successfully wrote input to \"{}\".", &input_path);
-            exit_with_status(0, &tmp_file_path);
         }
         Err(e) => {
             eprintln!("could not copy downloaded input to input file: {}", e);
             exit_with_status(1, &tmp_file_path);
         }
     }
+
+    open_in_code(&puzzle_path);
 }

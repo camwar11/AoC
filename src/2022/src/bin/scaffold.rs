@@ -7,6 +7,8 @@ use std::{
     process,
 };
 
+use advent_of_code::helpers::open_in_code;
+
 const MODULE_TEMPLATE: &str = r###"type ParsedLine<'a> = Vec<&'a str>;
 
 fn parse_line(line: &str) -> ParsedLine {
@@ -26,14 +28,16 @@ pub fn part_one(input: &str) -> Option<u32> {
     let mut result = 0;
     let mut parsed = parse_lines(input);
 
-    Some(result)
+    //Some(result)
+    None
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
     let mut result = 0;
     let mut parsed = parse_lines(input);
 
-    Some(result)
+    //Some(result)
+    None
 }
 
 fn main() {
@@ -123,4 +127,7 @@ fn main() {
         "🎄 Type `cargo solve {}` to run your solution.",
         &day_padded
     );
+
+    open_in_code(&module_path);
+    open_in_code(&example_path);
 }
