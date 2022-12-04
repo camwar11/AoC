@@ -7,12 +7,33 @@ use std::{
     process,
 };
 
-const MODULE_TEMPLATE: &str = r###"pub fn part_one(input: &str) -> Option<u32> {
-    None
+const MODULE_TEMPLATE: &str = r###"type ParsedLine<'a> = Vec<&'a str>;
+
+fn parse_line(line: &str) -> ParsedLine {
+    line.split_whitespace().collect()
+}
+
+fn parse_lines(input: &str) -> Vec<ParsedLine> {
+    let mut parsed = Vec::new();
+    for line in input.lines() {
+        parsed.push(parse_line(line));
+    }
+
+    parsed
+}
+
+pub fn part_one(input: &str) -> Option<u32> {
+    let mut result = 0;
+    let mut parsed = parse_lines(input);
+
+    Some(result)
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    None
+    let mut result = 0;
+    let mut parsed = parse_lines(input);
+
+    Some(result)
 }
 
 fn main() {
