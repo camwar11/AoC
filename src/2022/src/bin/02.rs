@@ -36,7 +36,6 @@ fn outcome_score(enemy_throw:Throw, your_throw:Throw) -> u32 {
 }
 
 fn calculate_score(enemy_throw:Throw, your_throw:Throw) -> u32 {
-    
     let shape_score = match your_throw {
         Throw::R => 1,
         Throw::P => 2,
@@ -44,6 +43,31 @@ fn calculate_score(enemy_throw:Throw, your_throw:Throw) -> u32 {
     };
 
     shape_score + outcome_score(enemy_throw, your_throw)
+}
+
+fn get_my_throw(enemy_throw: Throw, my_strat: char, part1: bool) -> Throw {
+    if part1 {
+        match my_strat {
+            'X' => Throw::R,
+            'Y' => Throw::P,
+            _ => Throw::S,
+        }
+    }
+    else {
+        match my_strat {
+            'X' => match enemy_throw {
+                Throw::R => Throw::S,
+                Throw::P => Throw::R,
+                Throw::S => Throw::P,
+            },
+            'Z' => match enemy_throw {
+                Throw::R => Throw::P,
+                Throw::P => Throw::S,
+                Throw::S => Throw::R,
+            },
+            _ => enemy_throw,
+        }
+    }
 }
 
 fn enemy_throw_map() -> HashMap<char, Throw> {
@@ -56,23 +80,13 @@ fn enemy_throw_map() -> HashMap<char, Throw> {
     map
 }
 
-fn my_throw_map() -> HashMap<char, Throw> {
-    let mut map = HashMap::new();
-
-    map.insert('X', Throw::R);
-    map.insert('Y', Throw::P);
-    map.insert('Z', Throw::S);
-
-    map
-}
-
-fn play_game(strategy: Vec<(char, char)>, enemy_map: HashMap<char, Throw>, my_map: HashMap<char, Throw>) -> u32 {
+fn play_game(strategy: Vec<(char, char)>, enemy_map: HashMap<char, Throw>, is_part1: bool) -> u32 {
     let mut score = 0;
     for round in strategy {
-        let enemy_throw = enemy_map.get(round.0.borrow());
-        let my_throw = my_map.get(round.1.borrow());
+        let enemy_throw = *enemy_map.get(round.0.borrow()).unwrap();
+        let my_throw = get_my_throw(enemy_throw, round.1, is_part1);
 
-        score += calculate_score(*enemy_throw.unwrap(), *my_throw.unwrap());
+        score += calculate_score(enemy_throw, my_throw);
     }
 
     score
@@ -86,13 +100,20 @@ pub fn part_one(input: &str) -> Option<u32> {
     }
 
     let enemy_throws = enemy_throw_map();
-    let my_throws  = my_throw_map();
 
-    Some(play_game(strategy, enemy_throws, my_throws))
+    Some(play_game(strategy, enemy_throws, true))
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    None
+    let mut strategy = Vec::new();
+    for line in input.lines() {
+        let split = line.split_whitespace().collect::<Vec<_>>();
+        strategy.push((split[0].chars().nth(0).unwrap(), split[1].chars().nth(0).unwrap()));
+    }
+
+    let enemy_throws = enemy_throw_map();
+
+    Some(play_game(strategy, enemy_throws, false))
 }
 
 fn main() {
@@ -114,6 +135,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let input = advent_of_code::read_file("examples", 2);
-        assert_eq!(part_two(&input), Some(0));
+        assert_eq!(part_two(&input), Some(12));
     }
 }
