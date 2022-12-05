@@ -1,5 +1,28 @@
 use std::{collections::HashMap, hash::Hash, borrow::Borrow};
 
+use advent_of_code::parsers::*;
+
+use nom::{
+    self, 
+     sequence::separated_pair, character::complete::{char}
+};
+
+type ParsedLine<'a> = (char, char);
+
+fn parse_line(line: &str) -> Result<ParsedLine, nom::Err<nom::error::Error<&str>>>{
+    let (_, pair) = separated_pair(anychar, char(' '), anychar)(line)?;
+    Ok(pair)
+}
+
+fn parse_lines(input: &str) -> Vec<ParsedLine> {
+    let mut parsed = Vec::new();
+    for line in input.lines() {
+        parsed.push(parse_line(line).unwrap());
+    }
+
+    parsed
+}
+
 #[derive(Eq, Hash, PartialEq, Clone, Copy)]
 enum Throw {
     R,
@@ -94,9 +117,8 @@ fn play_game(strategy: Vec<(char, char)>, enemy_map: HashMap<char, Throw>, is_pa
 
 pub fn part_one(input: &str) -> Option<u32> {
     let mut strategy = Vec::new();
-    for line in input.lines() {
-        let split = line.split_whitespace().collect::<Vec<_>>();
-        strategy.push((split[0].chars().nth(0).unwrap(), split[1].chars().nth(0).unwrap()));
+    for line in parse_lines(input){
+        strategy.push(line);
     }
 
     let enemy_throws = enemy_throw_map();
@@ -106,9 +128,8 @@ pub fn part_one(input: &str) -> Option<u32> {
 
 pub fn part_two(input: &str) -> Option<u32> {
     let mut strategy = Vec::new();
-    for line in input.lines() {
-        let split = line.split_whitespace().collect::<Vec<_>>();
-        strategy.push((split[0].chars().nth(0).unwrap(), split[1].chars().nth(0).unwrap()));
+    for line in parse_lines(input){
+        strategy.push(line);
     }
 
     let enemy_throws = enemy_throw_map();
