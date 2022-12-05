@@ -1,27 +1,22 @@
 use std::ops::RangeInclusive;
+use advent_of_code::parsers::p_range_inc_u32;
+
+use nom::{
+    self, 
+     sequence::separated_pair, character::complete::{char}
+};
 
 type ParsedLine<'a> = (RangeInclusive<u32>, RangeInclusive<u32>);
 
-fn parse_line(line: &str) -> ParsedLine {
-    let (elf1, elf2) = line.split_once(',').unwrap();
-    let (min1, max1) = elf1.split_once('-').unwrap();
-    let (min2, max2) = elf2.split_once('-').unwrap();
-
-    let range1 = RangeInclusive::new(
-        min1.parse().unwrap(),
-        max1.parse().unwrap()
-    );
-    let range2 = RangeInclusive::new(
-        min2.parse().unwrap(),
-        max2.parse().unwrap()
-    );
-    (range1, range2)
+fn parse_line(line: &str) -> Result<ParsedLine, nom::Err<nom::error::Error<&str>>>{
+    let (_, pair) = separated_pair(p_range_inc_u32, char(','), p_range_inc_u32)(line)?;
+    Ok(pair)
 }
 
 fn parse_lines(input: &str) -> Vec<ParsedLine> {
     let mut parsed = Vec::new();
     for line in input.lines() {
-        parsed.push(parse_line(line));
+        parsed.push(parse_line(line).unwrap());
     }
 
     parsed
