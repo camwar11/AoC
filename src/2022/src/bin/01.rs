@@ -1,17 +1,42 @@
+use advent_of_code::parsers::*;
+
+use nom::{
+    self
+};
+
+type ParsedLine<'a> = Option<u32>;
+
+fn parse_line(line: &str) -> Result<ParsedLine, nom::Err<nom::error::Error<&str>>>{
+    match p_str_u32(line) {
+        Ok(value) => Ok(Some(value.1)),
+        Err(_) => Ok(None)
+    }
+}
+
+fn parse_lines(input: &str) -> Vec<ParsedLine> {
+    let mut parsed = Vec::new();
+    for line in input.lines() {
+        parsed.push(parse_line(line).unwrap());
+    }
+
+    parsed
+}
+
 pub fn part_one(input: &str) -> Option<u32> {
     let mut current_value = 0;
     let mut largest = 0u32;
-    for line in input.lines() {
-        if line.is_empty() {
-            if current_value > largest {
-                largest = current_value;
+    for line in parse_lines(input) {
+        match line {
+            None => {
+                if current_value > largest {
+                    largest = current_value;
+                }
+                current_value = 0;
+            },
+            Some(calories) => {
+                current_value += calories;
             }
-            current_value = 0;
-            continue;
         }
-
-        let calories: u32 = line.parse().unwrap();
-        current_value += calories;
     }
 
     Some(largest)
@@ -20,15 +45,17 @@ pub fn part_one(input: &str) -> Option<u32> {
 pub fn part_two(input: &str) -> Option<u32> {
     let mut current_value = 0;
     let mut values = std::collections::BTreeSet::new();
-    for line in input.lines() {
-        if line.is_empty() {
-            values.insert(current_value);
-            current_value = 0;
-            continue;
-        }
 
-        let calories: u32 = line.parse().unwrap();
-        current_value += calories;
+    for line in parse_lines(input) {
+        match line {
+            None => {
+                values.insert(current_value);
+                current_value = 0;
+            },
+            Some(calories) => {
+                current_value += calories;
+            }
+        }
     }
 
     Some(values.iter().rev().take(3).sum())
