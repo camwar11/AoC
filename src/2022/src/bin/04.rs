@@ -1,5 +1,5 @@
 use std::ops::RangeInclusive;
-use advent_of_code::parsers::p_range_inc_u32;
+use advent_of_code::parsers::*;
 
 use nom::{
     self, 

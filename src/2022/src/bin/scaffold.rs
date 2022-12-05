@@ -9,16 +9,24 @@ use std::{
 
 use advent_of_code::helpers::open_in_code;
 
-const MODULE_TEMPLATE: &str = r###"type ParsedLine<'a> = Vec<&'a str>;
+const MODULE_TEMPLATE: &str = r###"use advent_of_code::parsers::*;
 
-fn parse_line(line: &str) -> ParsedLine {
-    line.split_whitespace().collect()
+use nom::{
+    self, 
+     sequence::separated_pair, character::complete::{char}
+};
+
+type ParsedLine<'a> = (u32, u32);
+
+fn parse_line(line: &str) -> Result<ParsedLine, nom::Err<nom::error::Error<&str>>>{
+    let (_, pair) = separated_pair(p_str_u32, char(','), p_str_u32)(line)?;
+    Ok(pair)
 }
 
 fn parse_lines(input: &str) -> Vec<ParsedLine> {
     let mut parsed = Vec::new();
     for line in input.lines() {
-        parsed.push(parse_line(line));
+        parsed.push(parse_line(line).unwrap());
     }
 
     parsed
