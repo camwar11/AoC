@@ -2,6 +2,41 @@ use std::collections::HashSet;
 
 type ParsedLine = RuckSack;
 
+use nom::{
+    self, 
+    bytes::complete::take
+};
+
+fn parse_line(line: &str) -> Result<ParsedLine, nom::Err<nom::error::Error<&str>>>{
+
+    let (rest, value) = take(line.len() / 2)(line)?;
+
+    let mut first = Compartment {
+        contents: HashSet::new()
+    };
+
+    first.contents.extend(value.chars());
+
+    let mut second = Compartment {
+        contents: HashSet::new()
+    };
+    second.contents.extend(rest.chars());
+
+    Ok(RuckSack {
+        first: first,
+        second: second
+    })
+}
+
+fn parse_lines(input: &str) -> Vec<ParsedLine> {
+    let mut parsed = Vec::new();
+    for line in input.lines() {
+        parsed.push(parse_line(line).unwrap());
+    }
+
+    parsed
+}
+
 struct RuckSack {
     first: Compartment,
     second: Compartment
@@ -47,38 +82,6 @@ impl RuckSack {
 
 struct Compartment {
     contents: HashSet<char>
-}
-
-fn parse_line(line: &str) -> ParsedLine {
-    let chars: Vec<char> = line.chars().collect();
-    let half = chars.len() / 2;
-    let first_half = &chars[..half];
-    let second_half = &chars[half..];
-
-    let mut first = Compartment {
-        contents: HashSet::new()
-    };
-
-    first.contents.extend(first_half);
-
-    let mut second = Compartment {
-        contents: HashSet::new()
-    };
-    second.contents.extend(second_half);
-
-    RuckSack {
-        first: first,
-        second: second
-    }
-}
-
-fn parse_lines(input: &str) -> Vec<ParsedLine> {
-    let mut parsed = Vec::new();
-    for line in input.lines() {
-        parsed.push(parse_line(line));
-    }
-
-    parsed
 }
 
 pub fn part_one(input: &str) -> Option<u32> {
