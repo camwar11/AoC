@@ -4,7 +4,7 @@ use advent_of_code::parsers::*;
 
 use nom::{
     self, 
-     sequence::separated_pair, character::complete::{char, none_of}, bytes::complete::{take, take_till}, error::{Error, ParseError}
+    character::complete::{none_of}, bytes::complete::{take}, error::{Error, ParseError}
 };
 
 type ParsedLine<'a> = (Vec<VecDeque<char>>, Vec<Move>);
@@ -108,14 +108,12 @@ fn make_moves_9001(parsed: &mut ParsedLine) -> String {
 }
 
 pub fn part_one(input: &str) -> Option<String> {
-    let mut result = 0;
     let mut parsed = parse_lines(input);
 
     Some(make_moves_9000(&mut parsed))
 }
 
 pub fn part_two(input: &str) -> Option<String> {
-    let mut result = 0;
     let mut parsed = parse_lines(input);
 
     Some(make_moves_9001(&mut parsed))
