@@ -77,7 +77,7 @@ fn parse_lines(input: &str) -> ParsedLine {
     (stacks, moves)
 }
 
-fn make_moves(parsed: &mut ParsedLine) -> String {
+fn make_moves_9000(parsed: &mut ParsedLine) -> String {
     for single in &parsed.1 {
         for _ in 0..single.number {
             let value = parsed.0[single.from].pop_back().unwrap();
@@ -89,19 +89,37 @@ fn make_moves(parsed: &mut ParsedLine) -> String {
     top_crates.collect()
 }
 
+fn make_moves_9001(parsed: &mut ParsedLine) -> String {
+    for single in &parsed.1 {
+        let mut moved_items = Vec::new();
+        for _ in 0..single.number {
+            let value = parsed.0[single.from].pop_back().unwrap();
+            moved_items.push(value);
+        }
+
+        for item in moved_items.iter().rev() {
+            parsed.0[single.to].push_back(*item);
+        }
+    }
+
+
+    let top_crates = parsed.0.clone().into_iter().skip(1).map(|vect| *vect.back().unwrap());
+    top_crates.collect()
+}
+
 pub fn part_one(input: &str) -> Option<String> {
     let mut result = 0;
     let mut parsed = parse_lines(input);
 
-    Some(make_moves(&mut parsed))
+    Some(make_moves_9000(&mut parsed))
 }
 
 pub fn part_two(input: &str) -> Option<String> {
     let mut result = 0;
     let mut parsed = parse_lines(input);
 
-    //Some(result)
-    None
+    Some(make_moves_9001(&mut parsed))
+
 }
 
 fn main() {
@@ -123,6 +141,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let input = advent_of_code::read_file("examples", 5);
-        assert_eq!(part_two(&input), Some("CMZ".to_string()));
+        assert_eq!(part_two(&input), Some("MCD".to_string()));
     }
 }
