@@ -51,6 +51,15 @@ pub fn read_file(folder: &str, day: u8) -> String {
     f.expect("could not open input file")
 }
 
+pub fn read_file_w_year(folder: &str, day: u8, year: u16) -> String {
+    let cwd = env::current_dir().unwrap();
+
+    let filepath = cwd.join("src").join(folder).join(format!("{}_{:02}.txt", year, day));
+
+    let f = fs::read_to_string(filepath);
+    f.expect("could not open input file")
+}
+
 fn parse_time(val: &str, postfix: &str) -> f64 {
     val.split(postfix).next().unwrap().parse().unwrap()
 }
