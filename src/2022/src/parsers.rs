@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-use nom::sequence::separated_pair;
+use nom::{sequence::separated_pair, error::ParseError, Parser};
 #[allow(unused_imports)]
 
 pub use nom::{
