@@ -16,6 +16,7 @@ struct TreeInfo {
     current: NodeIndex
 }
 
+#[derive(Debug)]
 struct FileItem {
     name: String,
     size: u32,
@@ -185,11 +186,25 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    let mut result = 0;
     let mut parsed = parse_lines(input);
 
-    //Some(result)
-    None
+    let root = parsed.root;
+
+    (parsed, _) = populate_dir_size(parsed, root);
+
+    let result;
+    const TOTAL: u32 = 70000000;
+    const NEEDED: u32 = 30000000;
+
+    let root_size = parsed.graph.node_weight(root).unwrap().size;
+    let remaining_size = TOTAL - root_size;
+
+    let need_to_delete = NEEDED - remaining_size;
+
+
+    result = parsed.graph.node_weights().filter(|d| !d.is_file && d.size > need_to_delete).map(|i| i.size).min().unwrap();
+
+    Some(result)
 }
 
 fn main() {
@@ -211,6 +226,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let input = advent_of_code::read_file("examples", 7);
-        assert_eq!(part_two(&input), Some(0));
+        assert_eq!(part_two(&input), Some(24933642));
     }
 }
