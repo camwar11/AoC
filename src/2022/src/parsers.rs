@@ -27,6 +27,30 @@ macro_rules! unsigned_nr_str_parser {
     };
 }
 
+macro_rules! nr_char_parser {
+    ($t:ident) => {
+        paste::item! {
+            pub fn [< p_char_ $t >](s: &str) -> IResult<&str, $t> {
+                map_res(one_of("0123456789"), |c: char| {
+                    match c {
+                        '0' => Ok(0),
+                        '1' => Ok(1),
+                        '2' => Ok(2),
+                        '3' => Ok(3),
+                        '4' => Ok(4),
+                        '5' => Ok(5),
+                        '6' => Ok(6),
+                        '7' => Ok(7),
+                        '8' => Ok(8),
+                        '9' => Ok(9),
+                        _ => Err(Err::Error((s, ErrorKind::Digit)))
+                    }
+                })(s)
+            }
+        }
+    };
+}
+
 macro_rules! signed_nr_str_parser {
     ($t:ident) => {
         paste::item! {
@@ -63,6 +87,7 @@ macro_rules! add_for_utype {
     ($t:ident) => {
         unsigned_nr_str_parser!($t);
         p_range_inc!($t);
+        nr_char_parser!($t);
     };
 }
 
@@ -70,6 +95,7 @@ macro_rules! add_for_itype {
     ($t:ident) => {
         signed_nr_str_parser!($t);
         p_range_inc!($t);
+        nr_char_parser!($t);
     };
 }
 

@@ -81,16 +81,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable '01'",
+            "name": "Debug unit tests in executable '08'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=01",
+                    "--bin=08",
                     "--package=advent_of_code"
                 ],
                 "filter": {
-                    "name": "01",
+                    "name": "08",
                     "kind": "bin"
                 }
             },
