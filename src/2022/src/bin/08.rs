@@ -1,6 +1,6 @@
 use std::{collections::HashSet, cmp::max};
 
-use advent_of_code::{parsers::*, matrix::matrix_from_vecs};
+use advent_of_code::{parsers::*, matrix::{matrix_from_vecs, items_in_direction, Direction}};
 
 use nalgebra::DMatrix;
 use nom::{
@@ -117,6 +117,103 @@ fn count_visible_trees(forest: &DMatrix<u16>) -> usize{
     visible.len()
 }
 
+fn scenic_score(forest: &DMatrix<u16>, idx: (usize, usize)) -> usize {
+    let tree_height = forest[idx];
+
+    let mut prev_blocked = false;
+    let binding = items_in_direction(forest, idx, Direction::UP);
+    let up:Vec<&u16> = binding.iter().take_while(|tree| 
+    {
+        if prev_blocked {
+            return false;
+        }
+
+        if **tree >= tree_height {
+            prev_blocked = true;
+        }
+
+        true
+    }).collect();
+
+    let up_size = up.len();
+
+    if up_size == 0 {
+        return 0;
+    }
+
+    prev_blocked = false;
+    let binding2 = items_in_direction(forest, idx, Direction::DOWN);
+    let down:Vec<&u16> = binding2.iter().take_while(|tree| 
+    {
+        if prev_blocked {
+            return false;
+        }
+
+        if **tree >= tree_height {
+            prev_blocked = true;
+        }
+        true
+    }).collect();
+
+    let down_size = down.len();
+    if down_size == 0 {
+        return 0;
+    }
+
+    prev_blocked = false;
+    let binding3 = items_in_direction(forest, idx, Direction::LEFT);
+    let left:Vec<&u16> = binding3.iter().take_while(|tree| 
+    {
+        if prev_blocked {
+            return false;
+        }
+        if **tree >= tree_height {
+            prev_blocked = true;
+        }
+        true
+    }).collect();
+
+    let left_size = left.len();
+    if left_size == 0 {
+        return 0;
+    }
+
+    prev_blocked = false;
+    let binding4 = items_in_direction(forest, idx, Direction::RIGHT);
+    let right:Vec<&u16> = binding4.iter().take_while(|tree| 
+    {
+        if prev_blocked {
+            return false;
+        }
+
+        if **tree >= tree_height {
+            prev_blocked = true;
+        }
+        true
+    }).collect();
+    let right_size = right.len();
+
+    if right_size == 0 {
+        return 0;
+    }
+
+    return up_size * down_size * left_size * right_size;
+}
+
+fn max_scenic_score(forest: &DMatrix<u16>) -> usize {
+    let mut max_score = 0;
+
+    let shape = forest.shape();
+
+    for row in 0..shape.0 {
+        for col in 0..shape.1 {
+            max_score = max(max_score, scenic_score(forest, (row, col)));
+        }
+    }
+
+    return max_score;
+}
+
 pub fn part_one(input: &str) -> Option<usize> {
     let matrix = parse_lines(input);
 
@@ -124,11 +221,9 @@ pub fn part_one(input: &str) -> Option<usize> {
 }
 
 pub fn part_two(input: &str) -> Option<usize> {
-    let mut result = 0;
-    let mut parsed = parse_lines(input);
+    let matrix = parse_lines(input);
 
-    //Some(result)
-    None
+    Some(max_scenic_score(&matrix))
 }
 
 fn main() {
@@ -150,6 +245,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let input = advent_of_code::read_file("examples", 8);
-        assert_eq!(part_two(&input), Some(0));
+        assert_eq!(part_two(&input), Some(8));
     }
 }
