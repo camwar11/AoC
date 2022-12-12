@@ -30,60 +30,82 @@ struct State {
     tail: Point2<i64>
 }
 
-fn make_move(mut state: State, the_move: ParsedLine, cache: &mut HashSet<(i64, i64)>) -> State {
+fn make_move(knots: Vec<Point2<i64>>, the_move: ParsedLine, cache: &mut HashSet<(i64, i64)>) -> Vec<Point2<i64>> {
     const UP :Vector2<i64> = Vector2::new(0, 1);
     const DOWN :Vector2<i64> = Vector2::new(0, -1);
     const LEFT :Vector2<i64> = Vector2::new(-1, 0);
     const RIGHT :Vector2<i64> = Vector2::new(1, 0);
 
+    let mut current_knots = knots;
+
     for _ in 0..the_move.1 {
-        state.head = match the_move.0 {
-            'U' => state.head + UP,
-            'D' => state.head + DOWN,
-            'L' => state.head + LEFT,
-            'R' => state.head + RIGHT,
+        let translation = match the_move.0 {
+            'U' => UP,
+            'D' => DOWN,
+            'L' => LEFT,
+            'R' => RIGHT,
             _ => panic!("Bad direction")
         };
 
-        let distance_x = ((state.head.x - state.tail.x)).abs();
-        let distance_y = ((state.head.y - state.tail.y)).abs();
+        let mut prev: Option<Point2<i64>> = None;
+        let mut new_knots = Vec::new();
 
-        if distance_x < 2 && distance_y < 2 {
-            continue;
+        for knot in &current_knots {
+            let mut new_knot = knot.to_owned(); 
+
+            if prev.is_none() {
+                new_knot = new_knot + translation;
+                prev = Some(new_knot);
+                new_knots.push(new_knot);
+                //println!("H {}, {}", new_knot.x, new_knot.y);
+                continue;
+            }
+
+            let distance_x = ((prev.unwrap().x - knot.x)).abs();
+            let distance_y = ((prev.unwrap().y - knot.y)).abs();
+
+            if distance_x < 2 && distance_y < 2 {
+                prev = Some(new_knot);
+                new_knots.push(new_knot);
+                continue;
+            }
+    
+            if prev.unwrap().x < knot.x {
+                new_knot = new_knot + LEFT;
+            }
+    
+            if prev.unwrap().x > knot.x {
+                new_knot = new_knot + RIGHT;
+            }
+    
+            if prev.unwrap().y < knot.y {
+                new_knot = new_knot + DOWN;
+            }
+    
+            if prev.unwrap().y > knot.y {
+                new_knot = new_knot + UP;
+            }
+
+            new_knots.push(new_knot);
+            prev = Some(new_knot);
         }
 
-        if state.head.x < state.tail.x {
-            state.tail = state.tail + LEFT;
-        }
+        cache.insert((prev.unwrap().x, prev.unwrap().y));
+        //println!("T {}, {}", prev.unwrap().x, prev.unwrap().y);
 
-        if state.head.x > state.tail.x {
-            state.tail = state.tail + RIGHT;
-        }
-
-        if state.head.y < state.tail.y {
-            state.tail = state.tail + DOWN;
-        }
-
-        if state.head.y > state.tail.y {
-            state.tail = state.tail + UP;
-        }
-
-        cache.insert((state.tail.x, state.tail.y));
+        current_knots = new_knots;
     }
 
-    state
+    current_knots
 }
 
 pub fn part_one(input: &str) -> Option<usize> {
     let mut result = HashSet::new();
     let parsed = parse_lines(input);
 
-    let mut state = State {
-        head: Point2::origin(),
-        tail: Point2::origin(),
-    };
+    let mut state = vec![Point2::origin(), Point2::origin()];
 
-    result.insert((state.tail.x, state.tail.y));
+    result.insert((0, 0));
 
     for my_move in parsed {
         state = make_move(state, my_move, &mut result);
@@ -93,11 +115,18 @@ pub fn part_one(input: &str) -> Option<usize> {
 }
 
 pub fn part_two(input: &str) -> Option<usize> {
-    let mut result = 0;
-    let mut parsed = parse_lines(input);
+    let mut result = HashSet::new();
+    let parsed = parse_lines(input);
 
-    //Some(result)
-    None
+    let mut state = vec![Point2::origin(), Point2::origin(), Point2::origin(), Point2::origin(), Point2::origin(), Point2::origin(), Point2::origin(), Point2::origin(), Point2::origin(), Point2::origin()];
+
+    result.insert((0, 0));
+
+    for my_move in parsed {
+        state = make_move(state, my_move, &mut result);
+    }
+
+    Some(result.len())
 }
 
 fn main() {
@@ -119,6 +148,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let input = advent_of_code::read_file("examples", 9);
-        assert_eq!(part_two(&input), Some(0));
+        assert_eq!(part_two(&input), Some(36));
     }
 }
