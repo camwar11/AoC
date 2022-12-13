@@ -67,3 +67,7 @@ pub fn open_in_code(path: &str) -> bool {
         }
     }
 }
+
+pub fn enum_variant_eq<T>(a: &T, b: &T) -> bool {
+    std::mem::discriminant(a) == std::mem::discriminant(b)
+}
