@@ -3,35 +3,19 @@ use std::collections::HashMap;
 use advent_of_code::simple_cpu::*;
 
 fn check_sig_strength(info: InterruptInfo, total: &mut i64) -> bool{
-    let next_cycles = match info.next_statement.call.as_str() {
-        "noop" => 2,
-        "addx" => 3,
-        _ => 0
-    };
+    let cycle_mod = (*info.cycle as i64) - 20;
 
-    for i in 1..next_cycles {
-        let cycle = (*info.cycle as i64) + i - 20;
-        if cycle < 0 || cycle % 40 != 0{
-            continue;
-        }  
+    if cycle_mod < 0 || cycle_mod % 40 != 0{
+        return *info.cycle < 220;
+    }  
 
-        let cycle = (*info.cycle as i64) + i;
+    let cycle = *info.cycle as i64;
 
-        let add = match info.next_statement.input {
-            InstructionInput::Int(int) => match i {
-                2 => int,
-                _ => 0
-            },
-            _ => 0
-        };
+    let value = cycle * info.registers[&'x'];
 
-        let value = cycle * (info.registers[&'x'] + add);
+    println!("Cycle {}: {}", cycle, value);
 
-        println!("Cycle {}: {}", cycle, value);
-
-        *total = *total + value;
-    }
-
+    *total = *total + value;
     *info.cycle < 220
 }
 

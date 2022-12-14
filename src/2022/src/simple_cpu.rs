@@ -20,11 +20,11 @@ struct InstructionInfo<T> {
 }
 
 struct InstructionOutput {
-    num_cycles: u32,
     new_inst_pointer: usize,
     result: Option<i64>
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ProgramStatement {
     pub call: String,
     pub input: InstructionInput
@@ -69,17 +69,18 @@ impl<T> SimpleCPU<T> {
         let prog_len = self.program.len();
 
         loop {
-            let statement = &self.program[self.instruction_pointer];
+            let statement = &self.program[self.instruction_pointer].clone();
             let instruction = self.instructions.get(&statement.call).unwrap();
-            
-            if !(self.interrupt_handler)(InterruptInfo { registers: &self.registers, cycle: &self.cycle, next_statement: statement }, state) {
-                break;
-            }
-            
+
             let result = (instruction.instruction)(self, statement.input.clone());
 
             self.instruction_pointer = result.new_inst_pointer;
-            self.cycle += result.num_cycles;
+
+            self.cycle += 1;
+
+            if !(self.interrupt_handler)(InterruptInfo { registers: &self.registers, cycle: &self.cycle, next_statement: statement }, state) {
+                break;
+            }
 
             if self.instruction_pointer >= prog_len {
                 self.instruction_pointer = 0;
@@ -115,6 +116,11 @@ impl<T> SimpleCPU<T> {
                 }
             }
 
+            if name == "addx" {
+                // Add a dummy noop to make it 2 cycles
+                program.push(ProgramStatement { call: "noop".to_string(), input: InstructionInput::None });
+            }
+
             program.push(ProgramStatement { call: name.to_string(), input });
         }
 
@@ -134,7 +140,7 @@ impl<T> SimpleCPU<T> {
     }
 
     fn noop(&mut self, input: InstructionInput) -> InstructionOutput {
-        InstructionOutput { num_cycles: 1, new_inst_pointer: self.instruction_pointer + 1, result: None }
+        InstructionOutput { new_inst_pointer: self.instruction_pointer + 1, result: None }
     }
 
     fn addx(&mut self, input: InstructionInput) -> InstructionOutput {
@@ -147,6 +153,6 @@ impl<T> SimpleCPU<T> {
 
         self.registers.insert('x', current);
 
-        InstructionOutput { num_cycles: 2, new_inst_pointer: self.instruction_pointer + 1, result: None }
+        InstructionOutput { new_inst_pointer: self.instruction_pointer + 1, result: None }
     }
 }
