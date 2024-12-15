@@ -42,6 +42,19 @@ class Point(object):
             raise AttributeError("point is not part of a grid")
         self.grid.movePointTo(self, newX, newY)
 
+    def getAdjacentPoints(self, includeDiagonals = False, includeMissing = False):
+        return self.grid.getAdjacentPoints(self.x, self.y, includeDiagonals, includeMissing)
+    
+    def getAdjacentPoint(self, direction, includeMissing = False):
+        newX, newY = self + direction
+        newPoint = self.grid.getPoint(newX, newY)
+        if newPoint:
+            return newPoint
+        elif includeMissing:
+            newPoint = Point(newX, newY, None)
+            newPoint.setGrid(self.grid)
+        return newPoint
+
 
 def defaultCellOutputStr(cell):
         return str(cell)
@@ -119,12 +132,9 @@ class CartesianGrid(object):
             directions = CartesianGrid.CardinalDirections()
 
         for direction in directions:
-            newX, newY = point + direction
-            newPoint = self.getPoint(newX, newY)
+            newPoint = point.getAdjacentPoint(direction, includeMissing)
             if newPoint:
                 points.append(newPoint)
-            elif includeMissing:
-                points.append(Point(newX, newY, None))
         return points
     
     def getAllPoints(self, lowYFirst = False) -> List[Point]:
