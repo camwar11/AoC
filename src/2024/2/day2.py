@@ -7,16 +7,74 @@ day, year = get_day_and_year()
 puzzle = Puzzle(year, day)
 
 def inputParser1(input_data):
-    return input_data.splitlines()
+    return [list(map(int, x.split(' '))) for x in input_data.splitlines()]
 
 def inputParser2(input_data):
     return inputParser1(input_data)
 
 def Part1(data):
-    return None
+    safe = 0
+    for report in data:
+        prev = None
+        inc = None
+        reportSafe = True
+        for level in report:
+            if prev == None:
+                prev = level
+                continue
+            diff = prev - level
+            prev = level
+            if(diff == 0 or abs(diff) > 3):
+                reportSafe = False
+                break
+            isInc = diff < 0
+            if(inc == None):
+                inc = isInc
+            else:
+                if inc != isInc:
+                    reportSafe = False
+                    break
+        if reportSafe:
+            safe += 1
+    return safe
+
+def isReportSafe(report, removeIdx = None):
+    prev = None
+    inc = None
+    reportSafe = True
+    for i, level in enumerate(report):
+        if i == removeIdx:
+            continue
+        if prev == None:
+            prev = level
+            continue
+        diff = prev - level
+        if(diff == 0 or abs(diff) > 3):
+            reportSafe = False
+            break
+        isInc = diff < 0
+        if(inc == None):
+            inc = isInc
+        else:
+            if inc != isInc:
+                reportSafe = False
+                break
+        prev = level
+    return reportSafe
+
 
 def Part2(data):
-    return None
+    safe = 0
+    for report in data:
+        reportSafe = isReportSafe(report)
+        if not reportSafe:
+            for i in range(report.__len__()):
+                reportSafe = isReportSafe(report, i)
+                if(reportSafe):
+                    break
+        if reportSafe:
+            safe += 1
+    return safe
 
 if runExamples:
     part1ExamplePassed = False
