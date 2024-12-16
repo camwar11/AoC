@@ -75,6 +75,12 @@ class CartesianGrid(object):
         self.emptyCellOutput = emptyCellOutput
         self.cellOutputStrFcn = cellOutputStrFcn
         self.flipOutput = flipOutput
+
+    def copy(self):
+        new = CartesianGrid(self.emptyCellOutput, self.cellOutputStrFcn, self.flipOutput)
+        for point in self.getAllPoints():
+            new.addPoint(Point(point.x, point.y, point.data))
+        return new
     
     def addPoint(self, point):
         xAxis = self.grid.get(point.x)
