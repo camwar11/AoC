@@ -21,7 +21,9 @@ class Point(object):
         if isinstance(other, Point):
             other = [other.x, other.y]
         return util.vector_math(sub, [self.x, self.y], other)
-        
+
+    def key(self):
+        return (self.x, self.y)
     
     def setGrid(self, grid):
         self.grid = grid
@@ -69,6 +71,32 @@ class CartesianGrid(object):
     UP_RIGHT = [1, 1]
     DOWN_LEFT = [-1, -1]
     DOWN_RIGHT = [1, -1]
+
+    directions = {
+        '^': UP,
+        '>': RIGHT,
+        'v': DOWN,
+        '<': LEFT
+    }
+
+    turn_clock = {
+        '^': '>',
+        '>': 'v',
+        'v': '<',
+        '<': '^'
+    }
+    turn_counterclock = {
+        '^': '<',
+        '>': '^',
+        'v': '>',
+        '<': 'v'
+    }
+    turn_180 = {
+        '^': 'v',
+        '>': '<',
+        'v': '^',
+        '<': '>'
+    }
 
     def __init__(self, emptyCellOutput = '.', cellOutputStrFcn = defaultCellOutputStr, flipOutput = False):
         self.grid = {}
