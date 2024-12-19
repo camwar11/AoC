@@ -201,7 +201,7 @@ class CartesianGrid(object):
                         allPoints.append(value)
         return allPoints
 
-    def getBounds(self):
+    def getBounds(self) -> (int, int, int, int):
         minX = None
         maxX = None
         minY = None
