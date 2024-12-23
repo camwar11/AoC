@@ -6,17 +6,64 @@ runExamples = True
 day, year = get_day_and_year()
 puzzle = Puzzle(year, day)
 
+def edgeWeightFcn1(start, end):
+    # Do this backwards to go from 9s down to other
+    if start.data - end.data != 1:
+        return None
+    return 1
+
+def edgeWeightFcn2(start, end):
+    if end.data - start.data != 1:
+        return None
+    return 1
+
 def inputParser1(input_data):
-    return input_data.splitlines()
+    grid = com.CartesianGrid()
+    lines = input_data.splitlines()
+    lines.reverse()
+    com.parse_to_grid(lines, grid, conversionFcn=int)
+    graph = com.Graph.parse_from_grid(grid, edgeWeightFinder=edgeWeightFcn1)
+    return graph
 
 def inputParser2(input_data):
-    return inputParser1(input_data)
+    grid = com.CartesianGrid()
+    lines = input_data.splitlines()
+    lines.reverse()
+    com.parse_to_grid(lines, grid, conversionFcn=int)
+    graph = com.Graph.parse_from_grid(grid, edgeWeightFinder=edgeWeightFcn2)
+    return graph
+
+def walkTrail(scores, graph, current_node, peak):
+    score = scores.setdefault(current_node, set())
+    score.add(peak)
+    for node in graph.direct_connected_weights_and_edges(current_node):
+        walkTrail(scores, graph, node, peak)
 
 def Part1(data):
-    return None
+    scores = dict()
+    trailheads = set()
+    for node in data.get_all_nodes():
+        if node.data == 9:
+            walkTrail(scores, data, node, node)
+        if node.data == 0:
+            trailheads.add(node)
+
+    return sum([len(scores[x]) for x in trailheads])
+
+def getRating(graph, current_node):
+    if current_node.data == 9:
+        return 1
+    total = 0
+    for node in graph.direct_connected_weights_and_edges(current_node):
+        total += getRating(graph, node)
+    return total
 
 def Part2(data):
-    return None
+    total = 0
+    for node in data.get_all_nodes():
+        if node.data == 0:
+            total += getRating(data, node)
+    return total
 
 if runExamples:
     part1ExamplePassed = False
@@ -33,9 +80,16 @@ if runExamples:
     ]
     for example in puzzle.examples:
         examples.append([
-            example.input_data,
+            """89010123
+78121874
+87430965
+96549874
+45678903
+32019012
+01329801
+10456732""",
             example.answer_a,
-            example.answer_b,
+            "81",
             example.extra
         ])
 

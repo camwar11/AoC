@@ -24,7 +24,7 @@ class Graph(object):
     def get_node(self, node):
         return self.__graph.get(node)
 
-    def get_all_nodes(self, node):
+    def get_all_nodes(self):
         return self.__graph.keys()
 
     def remove_node(self, node, reattachEnds = True):
@@ -112,6 +112,7 @@ class Graph(object):
                 edgeWeight = 1
                 if edgeWeightFinder:
                     edgeWeight = edgeWeightFinder(point, adjacent)
-                graph.add_edge(point, adjacent, edgeWeight, not(directed))
+                if edgeWeight is not None:
+                    graph.add_edge(point, adjacent, edgeWeight, not(directed))
         
         return graph
