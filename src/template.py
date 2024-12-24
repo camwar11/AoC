@@ -8,6 +8,7 @@ puzzle = Puzzle(year, day)
 
 def inputParser1(input_data):
     return input_data.splitlines()
+    # return com.parse_raw_to_grid(input_data)
 
 def inputParser2(input_data):
     return inputParser1(input_data)
@@ -19,8 +20,8 @@ def Part2(data):
     return None
 
 if runExamples:
-    part1ExamplePassed = False
-    part2ExamplePassed = False
+    part1ExamplePassed = True
+    part2ExamplePassed = True
 
     examples = [
         # Add custom examples here
@@ -44,17 +45,17 @@ if runExamples:
         if part1Answer != example[1]:
             print(f"Incorrect: part1 example {i}. Extra={example[3]};Input=\n{example[0]}\nExpect: {example[1]}\nActual: {part1Answer}")
             part1ExamplePassed = False
-            break
+            continue
         
         print("Part 1 Example Passed")
-        part1ExamplePassed = True
+        part1ExamplePassed &= True
         part2Answer = str(Part2(inputParser2(example[0])))
         if part2Answer != example[2]:
             print(f"Incorrect: part2 example {i}. Extra={example[3]};Input=\n{example[0]}\nExpect: {example[2]}\nActual: {part2Answer}")
             part2ExamplePassed = False
-            break
+            continue
         print("Part 2 Example Passed")
-        part2ExamplePassed = True
+        part2ExamplePassed &= True
 else:
     part1ExamplePassed = True
     part2ExamplePassed = True

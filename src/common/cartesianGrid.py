@@ -44,8 +44,8 @@ class Point(object):
             raise AttributeError("point is not part of a grid")
         self.grid.movePointTo(self, newX, newY)
 
-    def getAdjacentPoints(self, includeDiagonals = False, includeMissing = False):
-        return self.grid.getAdjacentPoints(self.x, self.y, includeDiagonals, includeMissing)
+    def getAdjacentPoints(self, includeDiagonals = False, includeMissing = False, includeDirection = False):
+        return self.grid.getAdjacentPoints(self.x, self.y, includeDiagonals, includeMissing, includeDirection)
     
     def getAdjacentPoint(self, direction, includeMissing = False):
         newX, newY = self + direction
@@ -154,7 +154,7 @@ class CartesianGrid(object):
             return xAxis.get(y)
         return None
 
-    def getAdjacentPoints(self, x, y, includeDiagonals = False, includeMissing = False):
+    def getAdjacentPoints(self, x, y, includeDiagonals = False, includeMissing = False, includeDirection = False):
         points = list()
         point = self.getPoint(x, y)
         if not point:
@@ -168,7 +168,10 @@ class CartesianGrid(object):
         for direction in directions:
             newPoint = point.getAdjacentPoint(direction, includeMissing)
             if newPoint:
-                points.append(newPoint)
+                if includeDirection:
+                    points.append((newPoint, direction))
+                else:
+                    points.append(newPoint)
         return points
     
     def getAllPoints(self, lowYFirst = False) -> List[Point]:
@@ -264,7 +267,7 @@ class CartesianGrid(object):
     def AllDirections() -> list:
         return [CartesianGrid.UP_LEFT, CartesianGrid.UP, CartesianGrid.UP_RIGHT, CartesianGrid.LEFT, CartesianGrid.RIGHT, CartesianGrid.DOWN_LEFT, CartesianGrid.DOWN, CartesianGrid.DOWN_RIGHT]
 
-def parse_to_grid(lines: List[str], grid: CartesianGrid, conversionFcn = None):
+def parse_to_grid(lines: List[str], grid: CartesianGrid, conversionFcn = None, flip = False):
     y = 0
     for line in lines:
         x = 0
@@ -277,3 +280,10 @@ def parse_to_grid(lines: List[str], grid: CartesianGrid, conversionFcn = None):
             grid.addPoint(point)
             x += 1
         y += 1
+def parse_raw_to_grid(raw_input: str, conversionFcn = None, flip = True):
+    lines = raw_input.splitlines()
+    grid = CartesianGrid()
+    if flip:
+        lines.reverse()
+    parse_to_grid(lines, grid, conversionFcn, flip)
+    return grid
