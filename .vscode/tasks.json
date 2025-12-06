@@ -15,6 +15,17 @@
             "problemMatcher": []
         },
         {
+            "label": "newDay (Python)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "createDay.py",
+                "${input:year}",
+                "${input:day}"
+            ],
+            "problemMatcher": []
+        },
+        {
             "label": "measureDay",
             "type": "shell",
             "command": "powershell",

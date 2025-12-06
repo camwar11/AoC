@@ -1,3 +1,4 @@
+import math
 from aocd.get import get_day_and_year
 from aocd.models import Puzzle
 import common as com
@@ -6,18 +7,46 @@ RUN_EXAMPLES = True
 day, year = get_day_and_year()
 puzzle = Puzzle(year, day)
 
-def input_parser_1(input_data: str) -> list[str]:
-    return input_data.splitlines()
+def input_parser_1(input_data: str) -> list[int]:
+    return [int(line.replace("L", "-").replace("R", "")) for line in input_data.splitlines() if line]
     # return com.parse_raw_to_grid(input_data)
 
-def input_parser_2(input_data: str) -> list[str]:
+def input_parser_2(input_data: str) -> list[int]:
     return input_parser_1(input_data)
 
-def part_1(data: list[str]) -> str | None:
-    return None
+def part_1(data: list[int]) -> str | None:
+    position = 50
+    mod = 100
+    count = 0
+    for move in data:
+        position += move
+        position %= mod
+        if position == 0:
+            count += 1
+    return str(count)
 
-def part_2(data: list[str]) -> str | None:
-    return None
+def part_2(data: list[int]) -> str | None:
+    position = 50
+    mod = 100
+    count = 0
+    for move in data:
+        prev = position
+        extra_rotations = math.floor(abs(move) / mod)
+        remove = extra_rotations * mod
+        if move < 0:
+            remove = -remove
+        leftovers = move - (remove )
+
+        position += leftovers
+        new_pos = position % mod
+
+        if new_pos == 0:
+            count += 1
+        elif new_pos != position and prev != 0:
+            count += 1
+        position = new_pos
+        count += extra_rotations
+    return str(count)
 
 if RUN_EXAMPLES:
     part1_example_passed = True
@@ -25,12 +54,18 @@ if RUN_EXAMPLES:
 
     examples = [
         # Add custom examples here
-        #[
-        #    "input_data",
-        #    "answer_a",
-        #    "answer_b",
-        #    "extra"
-        #]
+        [
+           "R149\nL175",
+           "0",
+           "2",
+           "extra"
+        ],
+        [
+           "R1000\nL50\nL1\nR2\nL1\nR200\nL1\nR200\nR2\nL150",
+           "3",
+           "21",
+           "extra"
+        ]
     ]
     for example in puzzle.examples:
         examples.append([
