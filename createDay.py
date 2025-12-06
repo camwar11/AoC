@@ -32,7 +32,7 @@ def create_day(year, day):
     
     # (day_path / "input.txt").touch()
     # (day_path / "test.txt").touch()
-    # os.system(f'code "{destination}"')
+    os.system(f'code "{destination}"')
     # os.system(f'code "{day_path / "test.txt"}"')
 
 if __name__ == "__main__":
