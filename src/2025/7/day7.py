@@ -38,14 +38,16 @@ def walk_timelines(start: com.Point) -> int:
     timelines = 0
     down = start.getAdjacentPoint(com.CartesianGrid.DOWN)
     if down is None:
-        #TODO: maybe not?
+        # Reached the end so this is a timeline
         return 1
     if down.data == SPLITTER:
+        # Split the two timelines and walk both
         left = down.getAdjacentPoint(com.CartesianGrid.LEFT)
         right = down.getAdjacentPoint(com.CartesianGrid.RIGHT)
         timelines += walk_timelines(left)
         timelines += walk_timelines(right)
     else:
+        # No split, so just continue this timeline down
         timelines += walk_timelines(down)
     return timelines
 
